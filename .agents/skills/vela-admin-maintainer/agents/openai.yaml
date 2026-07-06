@@ -1,0 +1,8 @@
+interface:
+  display_name: "Vela Admin Maintainer"
+  short_description: "Vela Admin 项目维护流程"
+  brand_color: "#6750A4"
+  default_prompt: "Use $vela-admin-maintainer to safely modify, verify, or release the Vela Admin project."
+
+policy:
+  allow_implicit_invocation: true

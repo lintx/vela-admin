@@ -65,9 +65,9 @@ docs/development/
 
 执行状态：
 
-- [ ] 确认 `vela-admin-maintainer` skill 的触发场景。
-- [ ] 确认 skill 只索引项目文档，不复制整套规范。
-- [ ] 创建项目级 skill。
+- [x] 确认 `vela-admin-maintainer` skill 的触发场景。
+- [x] 确认 skill 只索引项目文档，不复制整套规范。
+- [x] 创建项目级 skill。
 - [ ] 用真实任务验证 skill 是否会先读取 `AGENTS.md` 和相关 `docs/development/` 文件。
 - [ ] 根据试运行结果修订 skill。
 

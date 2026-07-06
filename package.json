@@ -16,7 +16,9 @@
     "publish:create": "node scripts/package-command.js packages/create-vela-admin publish --access public",
     "publish:all": "pnpm run publish:framework && pnpm run publish:create",
     "release:verify": "pnpm run test && pnpm run build && pnpm run pack:framework && pnpm run pack:create",
-    "release:publish": "pnpm run publish:all"
+    "release:publish": "pnpm run publish:all",
+    "codex:install-skill": "node scripts/install-codex-skill.js",
+    "codex:link-skill": "node scripts/install-codex-skill.js --link"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
