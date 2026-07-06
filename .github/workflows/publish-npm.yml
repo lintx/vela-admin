@@ -46,9 +46,18 @@ jobs:
       - name: Verify release
         run: pnpm run release:verify
 
-      - name: Configure npm token for first publish
+      - name: Check npm token for first publish
         if: env.NPM_TOKEN != ''
-        run: npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
+        run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish packages
+      - name: Publish packages with first-publish token
+        if: env.NPM_TOKEN != ''
+        run: pnpm run release:publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish packages with trusted publishing
+        if: env.NPM_TOKEN == ''
         run: pnpm run release:publish
