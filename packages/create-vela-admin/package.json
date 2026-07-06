@@ -1,6 +1,6 @@
 {
   "name": "create-vela-admin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "bin": {
@@ -15,6 +15,7 @@
     "postpack": "node ./scripts/clean-template.js"
   },
   "files": [
+    "README.md",
     "src",
     "template"
   ],
