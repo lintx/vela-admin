@@ -1,0 +1,24 @@
+{
+  "name": "create-vela-admin",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "create-vela-admin": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node ./src/index.js",
+    "create": "node ./src/index.js",
+    "sync-template": "node ./scripts/sync-template.js",
+    "clean-template": "node ./scripts/clean-template.js",
+    "prepack": "node ./scripts/sync-template.js",
+    "postpack": "node ./scripts/clean-template.js"
+  },
+  "files": [
+    "src",
+    "template"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

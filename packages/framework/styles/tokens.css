@@ -1,0 +1,21 @@
+:root {
+  --va-admin-sidebar-bg: var(--color-body);
+  --va-admin-sidebar-border: var(--color-outline-variant, var(--color-outline));
+  --va-admin-sidebar-width: 272px;
+  --va-admin-sidebar-collapsed-width: 56px;
+  --va-admin-sidebar-menu-item-height: 44px;
+  --va-admin-sidebar-icon-size: 22px;
+  --va-admin-sidebar-collapsed-icon-size: 26px;
+  --va-admin-header-height: 56px;
+  --va-admin-tags-view-height: 40px;
+  --va-admin-menu-text: var(--color-on-surface-variant);
+  --va-admin-menu-active-text: var(--color-on-primary-container);
+  --va-admin-menu-indicator: var(--color-primary);
+  --va-admin-menu-active-bg: color-mix(in srgb, var(--color-primary) 11%, transparent);
+  --va-admin-menu-hover-bg: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  --va-admin-menu-expanded-bg: color-mix(in srgb, var(--color-primary) 4%, transparent);
+  --va-admin-scrollbar-mode: thin;
+  --va-admin-scrollbar-width: 8px;
+  --va-admin-scrollbar-thumb: color-mix(in srgb, var(--color-on-surface-variant) 26%, transparent);
+  --va-admin-scrollbar-thumb-hover: color-mix(in srgb, var(--color-on-surface-variant) 42%, transparent);
+}

@@ -1,0 +1,25 @@
+{
+  "name": "varlet-admin-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter vela-admin-example dev",
+    "build": "pnpm --filter vela-admin build && pnpm --filter vela-admin-example build",
+    "test": "pnpm --filter vela-admin test && pnpm run test:create",
+    "test:create": "node --test packages/create-vela-admin/tests/create-cli.test.js scripts/package-command.test.js",
+    "create": "node packages/create-vela-admin/src/index.js",
+    "create:sync-template": "pnpm --filter create-vela-admin sync-template",
+    "pack:framework": "node scripts/package-command.js packages/framework pack --dry-run",
+    "pack:create": "node scripts/package-command.js packages/create-vela-admin pack --dry-run",
+    "publish:framework": "node scripts/package-command.js packages/framework publish --access public",
+    "publish:create": "node scripts/package-command.js packages/create-vela-admin publish --access public",
+    "publish:all": "pnpm run publish:framework && pnpm run publish:create",
+    "release:verify": "pnpm run test && pnpm run build && pnpm run pack:framework && pnpm run pack:create",
+    "release:publish": "pnpm run publish:all"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "vite": "^6.2.4"
+  }
+}

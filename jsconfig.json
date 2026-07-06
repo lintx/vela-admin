@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@example/*": ["./examples/admin/src/*"],
+      "@framework/*": ["./packages/framework/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

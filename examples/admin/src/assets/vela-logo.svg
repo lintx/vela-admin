@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 822 814" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="title desc">
+  <title id="title">Vela Admin logo</title>
+  <desc id="desc">A transparent Vela Admin logo with a rounded front sail, cyan rear sail, and narrow highlight edge.</desc>
+  <defs>
+    <linearGradient id="vela-front-tc" x1="112" y1="720" x2="520" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2635f0"/>
+      <stop offset="0.54" stop-color="#2a6ff5"/>
+      <stop offset="1" stop-color="#2aa8f7"/>
+    </linearGradient>
+    <linearGradient id="vela-back-tc" x1="432" y1="680" x2="650" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0784b9"/>
+      <stop offset="0.58" stop-color="#0eb8ca"/>
+      <stop offset="1" stop-color="#20dddd"/>
+    </linearGradient>
+    <linearGradient id="vela-edge-tc" x1="524" y1="72" x2="402" y2="732" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#68edf2"/>
+      <stop offset="0.62" stop-color="#2cc2e7"/>
+      <stop offset="1" stop-color="#1478c9"/>
+    </linearGradient>
+    <linearGradient id="vela-rear-shadow-tc" x1="474" y1="210" x2="430" y2="690" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#06345f" stop-opacity="0"/>
+      <stop offset="0.34" stop-color="#06345f" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#06345f" stop-opacity=".18"/>
+    </linearGradient>
+    <filter id="vela-shadow-tc" x="-12%" y="-10%" width="128%" height="126%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#10306f" flood-opacity="0.2"/>
+    </filter>
+    <filter id="vela-blur-tc" x="-45%" y="-12%" width="190%" height="136%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <clipPath id="vela-front-clip-tc">
+      <path d="M 514 8 C 540 -9 564 16 550 49 C 514 235 478 421 442 608 C 431 666 419 724 405 777 C 400 801 377 816 354 810 L 22 725 C -1 719 -8 691 6 672 C 117 462 276 243 514 8 Z"/>
+    </clipPath>
+    <clipPath id="vela-back-clip-tc">
+      <path d="M 482 165 C 508 205 535 253 558 300 C 615 415 690 566 812 701 C 828 719 817 748 790 747 C 657 737 531 721 402 699 C 381 695 374 669 389 654 C 434 604 459 517 471 425 C 482 340 477 248 482 165 Z"/>
+    </clipPath>
+  </defs>
+
+  <g filter="url(#vela-shadow-tc)">
+    <path d="M 482 165 C 508 205 535 253 558 300 C 615 415 690 566 812 701 C 828 719 817 748 790 747 C 657 737 531 721 402 699 C 381 695 374 669 389 654 C 434 604 459 517 471 425 C 482 340 477 248 482 165 Z" fill="url(#vela-back-tc)"/>
+    <path d="M 468 190 C 482 330 474 498 438 704" fill="none" stroke="url(#vela-rear-shadow-tc)" stroke-width="70" stroke-linecap="round" filter="url(#vela-blur-tc)" opacity=".78" clip-path="url(#vela-back-clip-tc)"/>
+    <path d="M 504.075 17.403 C 527.28 -0.829 556.562 9.945 550 49 C 514 235 478 421 442 608 C 431 666 419 724 405 777 C 400 801 377 816 354 810 C 243.333 781.667 22 725 22 725 C -1 719 -8 691 6 672 C 117 462 266.075 252.403 504.075 17.403 Z" fill="url(#vela-front-tc)"/>
+    <path d="M 551.589 39.779 C 520.589 203.779 488 366 458 526 C 442 612 422.11 699.45 404.8 777.2 C 396.127 807.029 362.194 886.979 378.194 799.979 C 412.586 638.339 508.501 185.751 539.501 22.751 C 543.921 5.348 551.671 29.894 551.589 39.779 Z" fill="url(#vela-edge-tc)" opacity=".84" clip-path="url(#vela-front-clip-tc)"/>
+  </g>
+</svg>

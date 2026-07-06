@@ -1,0 +1,23 @@
+{
+  "name": "vela-admin-example",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "enable:auto-import": "node scripts/enable-auto-import.js"
+  },
+  "dependencies": {
+    "vela-admin": "workspace:*",
+    "@varlet/touch-emulator": "^3.10.7",
+    "@varlet/ui": "^3.10.7",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "vite": "^6.2.4"
+  }
+}
