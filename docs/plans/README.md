@@ -30,6 +30,4 @@
 
 ## 当前计划
 
-- [维护治理计划](maintenance-governance.md)
-- [维护规范试运行记录](maintenance-governance-trial.md)
 - [项目治理规范补全计划](project-governance-expansion.md)

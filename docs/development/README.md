@@ -30,6 +30,6 @@
 
 ## 后续治理
 
-当前阶段先维护公开仓库内的规范文档。等规则稳定后，再抽取项目级 `vela-admin-maintainer` skill，用于固化 AI 执行流程。
+当前仓库已提供项目级 `vela-admin-maintainer` skill，位置为 `.agents/skills/vela-admin-maintainer/`。skill 只固化 AI 执行入口、上下文读取顺序和沙箱约束，不替代本目录中的稳定维护规范。
 
-长期计划放在 [docs/plans](../plans/README.md)，影响长期维护的决策记录放在 [docs/adr](../adr/README.md)。
+修改 `AGENTS.md` 或 `docs/development/` 中会影响 AI 执行、沙箱、提交、验收或上下文读取的规则时，应同步更新项目 skill。长期计划放在 [docs/plans](../plans/README.md)，影响长期维护的决策记录放在 [docs/adr](../adr/README.md)。

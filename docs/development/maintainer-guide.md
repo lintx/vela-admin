@@ -2,7 +2,7 @@
 
 ## 适用范围
 
-本文面向 Vela Admin 的维护者、贡献者和 AI 助手，用于说明仓库结构、本地开发、模板维护和发布检查。使用框架开发业务应用的用户应优先阅读根目录 README 和 `docs/` 根级用户文档。
+本文面向 Vela Admin 维护者，说明仓库结构、本地开发、模板维护和发布检查。使用框架开发业务应用的用户应优先阅读根目录 README 和 `docs/` 根级用户文档。
 
 ## 仓库结构
 
@@ -27,54 +27,22 @@
 
 ## 本地开发
 
-安装依赖：
-
 ```sh
 pnpm install
-```
-
-启动示例工程：
-
-```sh
 pnpm run dev
-```
-
-构建示例工程和框架包：
-
-```sh
 pnpm run build
-```
-
-运行测试：
-
-```sh
 pnpm run test
-```
-
-只运行 create 包测试：
-
-```sh
 pnpm run test:create
-```
-
-生成一个本地测试项目：
-
-```sh
 pnpm run create -- my-app
 ```
 
-该命令会在当前执行目录下生成 `my-app`。在仓库根目录执行时，生成目录位于仓库根目录下，不会落到 `packages/create-vela-admin` 内。
+`pnpm run create -- my-app` 会在当前执行目录下生成 `my-app`；在仓库根目录执行时，生成目录位于仓库根目录下，不会落到 `packages/create-vela-admin` 内。
 
 ## 模板维护
 
 仓库内只长期维护 `examples/admin` 这一份模板源码。发布 `create-vela-admin` 时，模板由发布流程临时同步到 `packages/create-vela-admin/template/admin`，并在打包后清理。
 
-维护要求：
-
-1. 不手工维护 `packages/create-vela-admin/template`。
-2. 不提交发布流程临时生成的模板目录。
-3. 示例工程应使用框架已提供能力和 Varlet 组件组织页面。
-4. 改 create 包或模板同步逻辑后运行 `pnpm run test:create`。
+维护要求：不手工维护或提交 `packages/create-vela-admin/template`；示例工程应使用框架已提供能力和 Varlet 组件；改 create 包或模板同步逻辑后运行 `pnpm run test:create`。
 
 相关规范：
 
@@ -84,16 +52,11 @@ pnpm run create -- my-app
 
 ## 打包和发布检查
 
-常用打包检查：
+常用命令：
 
 ```sh
 pnpm run pack:framework
 pnpm run pack:create
-```
-
-常用发布命令：
-
-```sh
 pnpm run publish:framework
 pnpm run publish:create
 pnpm run publish:all
@@ -113,6 +76,5 @@ pnpm run publish:all
 1. 只维护 `examples/admin` 这一份模板源码。
 2. 不提交 `packages/create-vela-admin/template`。
 3. 不在 `create` 命令中依赖 monorepo 外部路径。
-4. 发布前通过 `pnpm run pack:create` 检查 create 包是否包含模板。
-5. 发布前通过 `pnpm run pack:framework` 检查 framework 包是否只包含必要文件。
-6. 维护者和 AI 协作规则见 [AI 协作规范](ai-collaboration.md)。
+4. 发布前通过 `pnpm run pack:create` 和 `pnpm run pack:framework` 检查包内容。
+5. 维护者和 AI 协作规则见 [AI 协作规范](ai-collaboration.md)。
