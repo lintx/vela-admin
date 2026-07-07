@@ -3,6 +3,23 @@
   "version": "0.1.1",
   "private": false,
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lintx/vela-admin",
+    "directory": "packages/framework"
+  },
+  "bugs": {
+    "url": "https://github.com/lintx/vela-admin/issues"
+  },
+  "homepage": "https://github.com/lintx/vela-admin#readme",
+  "keywords": [
+    "vue",
+    "admin",
+    "varlet",
+    "material-design",
+    "vite"
+  ],
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {

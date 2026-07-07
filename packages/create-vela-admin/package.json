@@ -3,6 +3,24 @@
   "version": "0.1.1",
   "private": false,
   "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lintx/vela-admin",
+    "directory": "packages/create-vela-admin"
+  },
+  "bugs": {
+    "url": "https://github.com/lintx/vela-admin/issues"
+  },
+  "homepage": "https://github.com/lintx/vela-admin#readme",
+  "keywords": [
+    "create",
+    "cli",
+    "vue",
+    "admin",
+    "vite",
+    "varlet"
+  ],
   "bin": {
     "create-vela-admin": "./src/index.js"
   },
