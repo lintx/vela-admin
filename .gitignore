@@ -19,6 +19,7 @@ coverage
 # Local env
 .env
 .env.*
+!examples/admin/.env.github-pages
 !.env.example
 *.local
 

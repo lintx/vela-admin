@@ -4,6 +4,7 @@ import 'vela-admin/style'
 
 import Varlet from '@varlet/ui'
 import { ref } from 'vue'
+import { createWebHashHistory, createWebHistory } from 'vue-router'
 import {
   createAdminApp,
   defineAdminConfig,
@@ -39,8 +40,12 @@ const pagesMap = {
   ...eagerPages,
   ...pageMeta,
 }
+const routerHistoryMode = import.meta.env.VITE_ADMIN_ROUTER_HISTORY === 'hash' ? 'hash' : 'web'
 const router = createAdminRouter({
   pages: pagesMap,
+  history: routerHistoryMode === 'hash'
+    ? createWebHashHistory(import.meta.env.BASE_URL)
+    : createWebHistory(import.meta.env.BASE_URL),
 })
 
 const permission = createPermissionService()
