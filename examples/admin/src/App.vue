@@ -13,6 +13,9 @@ import {
   useMenu,
 } from 'vela-admin/menu'
 import {
+  permissionInjectionKey,
+} from 'vela-admin/permission'
+import {
   applyAdminTheme,
   createAdminTheme,
   createSourceColorAdminTheme,
@@ -28,11 +31,13 @@ const route = useRoute()
 const router = useRouter()
 const menu = useMenu()
 const auth = inject(mockAuthInjectionKey, null)
+const permission = inject(permissionInjectionKey, null)
+const persistedSettings = loadAdminSettings()
 const tabsService = createTabsService({
   homePath: '/',
-  fixedTabs: [{ path: '/', title: '控制台' }],
+  fixedTabs: createDefaultFixedTabs(),
 })
-const persistedSettings = loadAdminSettings()
+restorePinnedTabs(persistedSettings.fixedTabs)
 const layoutMode = ref(persistedSettings.layoutMode)
 const sidebarWidth = ref(persistedSettings.sidebarWidth)
 const scrollbar = ref(persistedSettings.scrollbar)
@@ -114,6 +119,7 @@ function loadAdminSettings() {
       menuSearch: true,
       settings: true,
     },
+    fixedTabs: [],
   }
 
   try {
@@ -129,6 +135,54 @@ function loadAdminSettings() {
   }
 }
 
+function createDefaultFixedTabs() {
+  return [
+    { path: '/', title: resolveTabTitle('/', '控制台') },
+  ]
+}
+
+function restorePinnedTabs(fixedTabs = []) {
+  if (!Array.isArray(fixedTabs)) {
+    return
+  }
+
+  for (const tab of fixedTabs) {
+    if (!tab?.path || tab.path === '/' || !canAccessTabPath(tab.path)) {
+      continue
+    }
+
+    tabsService.addTab({
+      path: tab.path,
+      title: resolveTabTitle(tab.path, tab.title),
+      fixed: true,
+      closable: true,
+    })
+  }
+}
+
+function canAccessTabPath(path) {
+  const resolved = router.resolve(path)
+  if (!resolved.matched.length) {
+    return false
+  }
+
+  const requiredPermission = resolved.meta?.permission
+  if (!requiredPermission) {
+    return true
+  }
+
+  return Boolean(permission?.isLoggedIn() && permission.hasPermission(requiredPermission))
+}
+
+function resolveTabTitle(path, fallback) {
+  return String(router.resolve(path).meta?.title || fallback || path)
+}
+
+function getPersistedFixedTabs() {
+  return tabsService.getTabs()
+    .filter((tab) => tab.fixed && tab.path !== '/')
+    .map((tab) => ({ path: tab.path, title: tab.title }))
+}
 function defaultCustomColors() {
   return []
 }
@@ -170,6 +224,7 @@ function persistAdminSettings() {
     sourceColor: sourceColor.value,
     customColors: customColors.value,
     layoutFeatures: layoutFeatures.value,
+    fixedTabs: getPersistedFixedTabs(),
   }))
 }
 
@@ -486,16 +541,28 @@ function resolveFallbackPathAfterBatchClose(previousTabs, removedTabs, activePat
 
 function pinTab(path) {
   const tab = tabs.value.find((item) => item.path === path)
-  if (!tab || path === '/') {
+  if (!tab || tab.closable === false) {
     return
   }
 
   tabsService.addTab({
     ...tab,
     fixed: !tab.fixed,
-    closable: Boolean(tab.fixed),
+    closable: true,
   })
   syncTabs()
+  commitAdminSettings()
+}
+
+function reorderTab(path, targetPath) {
+  if (tabsService.moveTab(path, targetPath)) {
+    syncTabs()
+    commitAdminSettings()
+  }
+}
+
+function openGitHubRepository() {
+  window.open('https://github.com/lintx/vela-admin', '_blank', 'noopener,noreferrer')
 }
 
 function maximizeTabs() {
@@ -649,6 +716,7 @@ watch(layoutFeatures, commitAdminSettings, { deep: true })
     @close-all-tabs="closeAllTabs"
     @refresh-tab="refreshTab"
     @pin-tab="pinTab"
+    @reorder-tab="reorderTab"
     @maximize-tabs="maximizeTabs"
     @restore-tabs="restoreTabs"
     @close-header-tools="closeHeaderToolMenus"
@@ -677,6 +745,10 @@ watch(layoutFeatures, commitAdminSettings, { deep: true })
       <div class="admin-preview__header-actions">
         <var-button class="admin-preview__tool-button" text @click="layoutMode = layoutMode === 'side' ? 'top' : layoutMode === 'top' ? 'mixed' : 'side'">
           {{ layoutModeText }}
+        </var-button>
+        <var-button class="admin-preview__tool-button" text aria-label="打开 GitHub 仓库" @click="openGitHubRepository">
+          <VaIcon library="tabler" name="brand-github" :size="22" />
+          <span class="admin-preview__tool-label admin-preview__tool-label--adaptive">GitHub</span>
         </var-button>
         <var-button class="admin-preview__tool-button" text @click="toggleThemeMode($event)">
           <VaIcon :name="themeMode === 'light' ? 'moon' : 'sun'" :size="22" />

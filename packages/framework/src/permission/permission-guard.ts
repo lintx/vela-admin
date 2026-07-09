@@ -24,6 +24,10 @@ export function createPermissionGuard(
   options: CreatePermissionGuardOptions,
 ): NavigationGuard {
   return (to) => {
+    if (to.meta.public || to.meta.specialRoute) {
+      return true
+    }
+
     const permission = normalizePermission(to.meta.permission)
 
     if (!permission) {

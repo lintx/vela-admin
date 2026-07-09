@@ -34,6 +34,7 @@ export function parseAdminRoutes(glob: PageGlob, options: ParseAdminRoutesOption
     .map(([filePath, module], index) => createRouteEntry(filePath, module, pagesRoot, metaMap, index))
 
   assertUniqueRoutes(routeEntries)
+  applyInheritedPermissions(routeEntries, metaMap)
 
   return routeEntries
     .sort(compareRouteEntries)
@@ -99,6 +100,72 @@ export function parseAdminMenuMeta(glob: PageGlob, options: ParseAdminRoutesOpti
     })
 }
 
+function applyInheritedPermissions(routeEntries: RouteEntry[], metaMap: Map<string, AdminRouteMeta>): void {
+  const permissionMap = new Map<string, string[]>()
+
+  metaMap.forEach((meta, relativePath) => {
+    const permission = normalizePermissionList(meta.permission)
+    if (permission) {
+      permissionMap.set(fileNameToRoutePath(relativePath), permission)
+    }
+  })
+
+  routeEntries.forEach((entry) => {
+    const permission = normalizePermissionList(entry.meta?.permission)
+    if (permission) {
+      permissionMap.set(entry.routePath, permission)
+    }
+  })
+
+  routeEntries.forEach((entry) => {
+    if (entry.meta?.public || entry.meta?.specialRoute) {
+      return
+    }
+
+    const inheritedPermission = collectInheritedPermissions(entry.routePath, permissionMap)
+    if (inheritedPermission) {
+      entry.meta = {
+        ...entry.meta,
+        permission: inheritedPermission,
+      }
+    }
+  })
+}
+
+function collectInheritedPermissions(path: string, permissionMap: Map<string, string[]>): string | string[] | undefined {
+  const pathChain = [...createRouteParentPaths(path).reverse(), path]
+  const permissions = pathChain.flatMap((item) => permissionMap.get(item) ?? [])
+  const uniquePermissions = Array.from(new Set(permissions))
+
+  if (uniquePermissions.length === 0) {
+    return undefined
+  }
+
+  return uniquePermissions.length === 1 ? uniquePermissions[0] : uniquePermissions
+}
+function createRouteParentPaths(path: string): string[] {
+  const segments = path.split('/').filter(Boolean)
+  const parentPaths: string[] = []
+
+  for (let index = segments.length - 1; index > 0; index -= 1) {
+    parentPaths.push(`/${segments.slice(0, index).join('/')}`)
+  }
+
+  return parentPaths
+}
+
+function normalizePermissionList(permission: unknown): string[] | undefined {
+  if (typeof permission === 'string') {
+    return [permission]
+  }
+
+  if (Array.isArray(permission)) {
+    const permissions = permission.filter((item): item is string => typeof item === 'string')
+    return permissions.length > 0 ? permissions : undefined
+  }
+
+  return undefined
+}
 function createRouteEntry(
   filePath: string,
   module: PageGlob[string],

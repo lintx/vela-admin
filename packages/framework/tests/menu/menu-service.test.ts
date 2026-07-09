@@ -38,6 +38,47 @@ describe('createMenuService', () => {
       },
     ])
   })
+  it('inherits parent permissions and prunes empty menu-only groups after filtering', () => {
+    const permission = createPermissionService({
+      session: {
+        token: 'token',
+        permissions: ['demo:view'],
+        roles: [],
+      },
+    })
+    const routesWithPermissions = [
+      route('/demo/level1/allowed', '可访问页面', { permission: 'demo:read', order: 10 }),
+      route('/demo/level1/denied', '不可访问页面', { permission: 'demo:edit', order: 20 }),
+      route('/empty/level1/leaf', '空目录页面', { permission: 'empty:view' }),
+    ]
+    const metaWithParents = [
+      menuMeta('/demo', '多级示例', { icon: 'format-list-bulleted', permission: 'demo:view' }),
+      menuMeta('/demo/level1', '一级目录'),
+      menuMeta('/empty', '空目录', { icon: 'folder' }),
+      menuMeta('/empty/level1', '空一级目录'),
+    ]
+
+    expect(createMenuService({
+      routes: routesWithPermissions,
+      menuMeta: metaWithParents,
+      permission,
+    }).getMenus()).toEqual([])
+
+    permission.setSession({
+      token: 'token',
+      permissions: ['demo:view', 'demo:read'],
+      roles: [],
+    })
+
+    const menus = createMenuService({
+      routes: routesWithPermissions,
+      menuMeta: metaWithParents,
+      permission,
+    }).getMenus()
+
+    expect(menus.map((menu) => menu.path)).toEqual(['/demo'])
+    expect(menus[0].children[0].children.map((menu) => menu.path)).toEqual(['/demo/level1/allowed'])
+  })
 
   it('creates menu-only parents from meta records and marks parents as non-navigable', () => {
     const service = createMenuService({

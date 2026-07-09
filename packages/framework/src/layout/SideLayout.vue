@@ -58,6 +58,7 @@ const emit = defineEmits<{
   closeAllTabs: []
   refreshTab: [path: string]
   pinTab: [path: string]
+  reorderTab: [path: string, targetPath: string]
   maximizeTabs: []
   restoreTabs: []
 }>()
@@ -330,6 +331,7 @@ function clearSuppressBreadcrumbClickTimer() {
         @close-all="emit('closeAllTabs')"
         @refresh="emit('refreshTab', $event)"
         @pin="emit('pinTab', $event)"
+        @reorder="(path, targetPath) => emit('reorderTab', path, targetPath)"
         @maximize="emit('maximizeTabs')"
         @restore="emit('restoreTabs')"
       />

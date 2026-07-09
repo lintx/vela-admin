@@ -48,6 +48,26 @@ describe('admin icons', () => {
     })
   })
 
+  it('resolves demo action icons without falling back to question', () => {
+    for (const icon of [
+      'github',
+      'tabler:brand-github',
+      'menu-2',
+      'format-list-bulleted',
+      'link',
+      'view',
+      'copy',
+      'download',
+      'focus-2',
+      'cursor-click',
+      'text',
+    ]) {
+      expect(resolveAdminIcon(icon), icon).toMatchObject({
+        fallback: false,
+      })
+    }
+  })
+
   it('falls back to question icon and warns for unknown icon in development', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
 

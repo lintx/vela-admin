@@ -88,6 +88,8 @@ describe('AdminLayout stage 7 navigation controls', () => {
     expect(sidebarItem).toContain('const vRipple = Ripple')
     expect(sidebarItem).toContain('v-ripple')
     expect(tagsView).toContain('const vRipple = Ripple')
+    expect(tagsView).not.toContain('createRestoredRippleDirective')
+    expect(tagsView).not.toContain('v-tag-ripple')
     expect(tagsView.match(/v-ripple/g)).toHaveLength(5)
   })
 })

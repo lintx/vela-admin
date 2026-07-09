@@ -6,6 +6,8 @@ export interface AdminRouteMeta {
   keepAlive?: boolean
   hidden?: boolean
   activeMenu?: string
+  public?: boolean
+  specialRoute?: string
   [key: string]: unknown
 }
 

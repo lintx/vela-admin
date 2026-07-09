@@ -1,5 +1,7 @@
 export {
   createAdminRouter,
+  type AdminSpecialRoute,
+  type AdminSpecialRouteType,
   type CreateAdminRouterOptions,
 } from './create-admin-router'
 export {

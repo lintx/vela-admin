@@ -30,9 +30,11 @@ import App from './App.vue'
 const lazyPages = import.meta.glob([
   './pages/**/*.vue',
   '!./pages/index.vue',
+  '!./pages/errors/**/*.vue',
 ])
 const eagerPages = import.meta.glob([
   './pages/index.vue',
+  './pages/errors/**/*.vue',
 ], { eager: true })
 const pageMeta = import.meta.glob('./pages/**/*.meta.js', { eager: true })
 const pagesMap = {
@@ -43,6 +45,12 @@ const pagesMap = {
 const routerHistoryMode = import.meta.env.VITE_ADMIN_ROUTER_HISTORY === 'hash' ? 'hash' : 'web'
 const router = createAdminRouter({
   pages: pagesMap,
+  specialRoutes: [
+    { path: '/exception/403', type: 'forbidden' },
+    { path: '/exception/404', type: 'not-found' },
+    { path: '/exception/500', type: 'server-error' },
+    { path: '/:path(.*)', type: 'not-found' },
+  ],
   history: routerHistoryMode === 'hash'
     ? createWebHashHistory(import.meta.env.BASE_URL)
     : createWebHistory(import.meta.env.BASE_URL),

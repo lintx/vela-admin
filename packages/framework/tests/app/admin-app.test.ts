@@ -184,6 +184,14 @@ describe('example AdminLayout integration', () => {
     expect(syncCurrentTabBody).not.toContain('closable: route.path !==')
   })
 
+  it('restores user pinned tabs as cancellable pins', () => {
+    const source = readFileSync(resolve(__dirname, '../../../../examples/admin/src/App.vue'), 'utf8')
+
+    expect(source).toContain('restorePinnedTabs(persistedSettings.fixedTabs)')
+    expect(source).toContain('closable: true')
+    expect(source).not.toContain('createInitialFixedTabs(persistedSettings.fixedTabs)')
+  })
+
   it('navigates to the nearest left tab after closing the current route tab and falls back home', () => {
     const source = readFileSync(resolve(__dirname, '../../../../examples/admin/src/App.vue'), 'utf8')
     const closeTabBody = source.match(/function closeTab\(path\) \{[\s\S]*?\n\}/)?.[0] ?? ''

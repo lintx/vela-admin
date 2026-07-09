@@ -4,6 +4,8 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import VaContextMenu from '../../components/context-menu/VaContextMenu.vue'
 import type { VaContextMenuGroupOption, VaContextMenuItemValue } from '../../components/context-menu/context-menu-types'
+import VaSortable from '../../components/sortable/VaSortable.vue'
+import type { VaSortableDropContext, VaSortablePayload } from '../../components/sortable/sortable-types'
 import VaIcon from '../../icons/VaIcon.vue'
 import type { AdminTab } from '../../tabs/create-tabs-service'
 
@@ -29,6 +31,7 @@ const emit = defineEmits<{
   closeAll: []
   refresh: [path: string]
   pin: [path: string]
+  reorder: [path: string, targetPath: string]
   maximize: []
   restore: []
 }>()
@@ -114,7 +117,7 @@ function updateScrollEdge() {
 
 function scrollActiveTabIntoView() {
   const activeTab = Array.from(listRef.value?.querySelectorAll<HTMLElement>('.va-admin-tags-view__item') ?? [])
-    .find(item => item.querySelector<HTMLElement>('[data-testid^="admin-tag-"]')?.dataset.testid === `admin-tag-${props.currentPath}`)
+    .find(item => item.querySelector<HTMLElement>(`[data-testid="admin-tag-${props.currentPath}"]`))
 
   activeTab?.scrollIntoView({
     block: 'nearest',
@@ -195,6 +198,33 @@ function handleTabKeydown(event: KeyboardEvent, tab: AdminTab) {
   }
 }
 
+function handleTabReorder(payload: VaSortablePayload<AdminTab>) {
+  const path = payload.keys[0]
+  const targetPath = props.tabs[payload.toIndex]?.path ?? props.tabs.at(-1)?.path
+  if (typeof path === 'string' && targetPath && path !== targetPath) {
+    emit('reorder', path, targetPath)
+  }
+}
+
+function canDropTab(context: VaSortableDropContext<AdminTab>) {
+  const tabMap = new Map(props.tabs.map(tab => [tab.path, tab]))
+  const ranks = context.previewKeys.map((key) => getTabFixedRank(tabMap.get(String(key))))
+
+  return ranks.every((rank, index) => index === 0 || rank >= ranks[index - 1])
+}
+
+function getTabFixedRank(tab: AdminTab | undefined) {
+  if (tab?.fixed && tab.closable === false) {
+    return 0
+  }
+
+  if (tab?.fixed) {
+    return 1
+  }
+
+  return 2
+}
+
 function handleMenuSelect(value: VaContextMenuItemValue) {
   const action = value as TagMenuAction
   const tab = contextTab.value
@@ -263,43 +293,70 @@ onBeforeUnmount(() => {
     </button>
 
     <div ref="listRef" class="va-admin-tags-view__list" @scroll="updateScrollEdge">
-      <div
-        v-for="tab in tabs"
-        :key="tab.path"
-        v-ripple
-        class="va-admin-tags-view__item"
-        :class="{
-          'va-admin-tags-view__item--active': tab.path === currentPath,
-          'va-admin-tags-view__item--fixed': tab.fixed,
-        }"
-        role="link"
-        tabindex="0"
-        :aria-current="tab.path === currentPath ? 'page' : undefined"
-        @pointerup="handleTabPointerUp($event, tab)"
-        @click="handleTabClick($event, tab)"
-        @keydown="handleTabKeydown($event, tab)"
-        @contextmenu="openContextMenu($event, tab)"
-        @auxclick="handleAuxClick($event, tab)"
+      <VaSortable
+        list-id="admin-tags"
+        class="va-admin-tags-view__items"
+        :items="tabs"
+        item-key="path"
+        strategy="horizontal-list"
+        :disabled="mobile"
+        :can-drop="canDropTab"
+        @reorder="handleTabReorder"
       >
-        <span
-          class="va-admin-tags-view__content"
-          :data-testid="`admin-tag-${tab.path}`"
-        >
-          <VaIcon v-if="tab.fixed && canPin(tab)" name="pin" class="va-admin-tags-view__pin" :size="18" />
-          <span class="va-admin-tags-view__title">{{ tab.title }}</span>
-        </span>
+        <template #item="{ item: tab, handleProps }">
+          <div
+            class="va-admin-tags-view__item"
+            :class="{
+              'va-admin-tags-view__item--active': tab.path === currentPath,
+              'va-admin-tags-view__item--fixed': tab.fixed,
+            }"
+            @auxclick="handleAuxClick($event, tab)"
+          >
+            <div
+              v-ripple
+              class="va-admin-tags-view__surface"
+              role="link"
+              tabindex="0"
+              :aria-current="tab.path === currentPath ? 'page' : undefined"
+              @pointerup="handleTabPointerUp($event, tab)"
+              @click="handleTabClick($event, tab)"
+              @keydown="handleTabKeydown($event, tab)"
+              @contextmenu="openContextMenu($event, tab)"
+            >
+              <button
+                v-if="!mobile"
+                class="va-admin-tags-view__drag"
+                type="button"
+                :data-testid="`admin-tag-drag-${tab.path}`"
+                v-bind="handleProps"
+                @click.stop
+                @keydown.stop
+              >
+                <VaIcon library="tabler" name="grip-vertical" :size="16" />
+              </button>
 
-        <button
-          v-if="canClose(tab)"
-          v-ripple
-          class="va-admin-tags-view__close va-admin-tags-view__close--round"
-          type="button"
-          :aria-label="`关闭${tab.title}`"
-          @click.stop="emit('close', tab.path)"
-        >
-          <VaIcon name="close" :size="20" />
-        </button>
-      </div>
+              <span
+                class="va-admin-tags-view__content"
+                :data-testid="`admin-tag-${tab.path}`"
+              >
+                <VaIcon v-if="tab.fixed && canPin(tab)" name="pin" class="va-admin-tags-view__pin" :size="18" />
+                <span class="va-admin-tags-view__title">{{ tab.title }}</span>
+              </span>
+
+              <button
+                v-if="canClose(tab)"
+                v-ripple
+                class="va-admin-tags-view__close va-admin-tags-view__close--round"
+                type="button"
+                :aria-label="`关闭${tab.title}`"
+                @click.stop="emit('close', tab.path)"
+              >
+                <VaIcon name="close" :size="20" />
+              </button>
+            </div>
+          </div>
+        </template>
+      </VaSortable>
     </div>
 
     <button
@@ -355,13 +412,17 @@ onBeforeUnmount(() => {
 
 .va-admin-tags-view__scroll,
 .va-admin-tags-view__maximize,
-.va-admin-tags-view__item,
 .va-admin-tags-view__close {
   position: relative;
   color: inherit;
   cursor: pointer;
   background: transparent;
   border: 0;
+}
+
+.va-admin-tags-view__scroll,
+.va-admin-tags-view__maximize,
+.va-admin-tags-view__close {
   overflow: hidden;
 }
 
@@ -401,6 +462,17 @@ onBeforeUnmount(() => {
   display: none;
 }
 
+.va-admin-tags-view__items {
+  display: flex;
+  flex: 0 0 auto;
+  min-width: max-content;
+  height: var(--va-admin-tags-view-height);
+}
+
+.va-admin-tags-view__items :deep(.va-sortable__placeholder) {
+  background-color: transparent;
+}
+
 .va-admin-tags-view__item {
   position: relative;
   display: inline-flex;
@@ -409,7 +481,6 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
   max-width: 220px;
   height: var(--va-admin-tags-view-height);
-  overflow: hidden;
   border-right: 1px solid var(--va-admin-sidebar-border);
 }
 
@@ -424,12 +495,46 @@ onBeforeUnmount(() => {
 
 .va-admin-tags-view__item--active::after {
   position: absolute;
+  z-index: 2;
   right: -1px;
   bottom: 0;
   left: -1px;
   height: 2px;
   content: "";
+  pointer-events: none;
   background: var(--color-primary);
+}
+
+.va-admin-tags-view__surface {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--va-admin-tags-view-height);
+  min-width: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+}
+
+.va-admin-tags-view__drag {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: var(--va-admin-tags-view-height);
+  margin-left: 4px;
+  color: inherit;
+  cursor: grab;
+  background: transparent;
+  border: 0;
+  opacity: 0.58;
+}
+
+.va-admin-tags-view__drag:active {
+  cursor: grabbing;
 }
 
 .va-admin-tags-view__content {
@@ -440,6 +545,10 @@ onBeforeUnmount(() => {
   height: var(--va-admin-tags-view-height);
   padding: 0 10px;
   gap: 6px;
+}
+
+.va-admin-tags-view__drag + .va-admin-tags-view__content {
+  padding-left: 4px;
 }
 
 .va-admin-tags-view__title {
@@ -471,7 +580,7 @@ onBeforeUnmount(() => {
 
 .va-admin-tags-view__scroll:hover,
 .va-admin-tags-view__maximize:hover,
-.va-admin-tags-view__item:hover,
+.va-admin-tags-view__item:hover .va-admin-tags-view__surface,
 .va-admin-tags-view__close:hover {
   background: var(--va-admin-menu-hover-bg);
 }

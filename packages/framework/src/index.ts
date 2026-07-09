@@ -195,6 +195,9 @@ export {
 export {
   default as VaDialog,
 } from './components/dialog/VaDialog.vue'
+export {
+  default as VaSortable,
+} from './components/sortable/VaSortable.vue'
 export type {
   VaContextMenuGroupOption,
   VaContextMenuItemOption,
@@ -202,3 +205,10 @@ export type {
   VaContextMenuPlacement,
   VaContextMenuTrigger,
 } from './components/context-menu/context-menu-types'
+export type {
+  VaSortableItemState,
+  VaSortableItemLock,
+  VaSortableKey,
+  VaSortablePayload,
+  VaSortableStrategy,
+} from './components/sortable/sortable-types'

@@ -14,6 +14,10 @@
   background: var(--color-body);
 }
 
+.va-admin-main:focus {
+  outline: none;
+}
+
 @media (max-width: 768px) {
   .va-admin-main {
     padding: 16px;

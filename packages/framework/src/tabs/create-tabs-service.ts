@@ -13,6 +13,7 @@ export interface CreateTabsServiceOptions {
 export interface TabsService {
   getTabs(): AdminTab[]
   addTab(tab: AdminTab): AdminTab
+  moveTab(path: string, targetPath: string): boolean
   closeCurrent(path: string): AdminTab | undefined
   closeOthers(path: string): AdminTab[]
   closeLeft(path: string): AdminTab[]
@@ -33,7 +34,8 @@ export function createTabsService(options: CreateTabsServiceOptions = {}): TabsS
       const existing = tabs.find((item) => item.path === tab.path)
 
       if (existing) {
-        if (!isFixedTab(existing) || tab.title !== tab.path) {
+        const wasFixed = isFixedTab(existing)
+        if (!wasFixed || tab.title !== tab.path) {
           existing.title = tab.title || existing.title
         }
         if ('fixed' in tab) {
@@ -42,12 +44,55 @@ export function createTabsService(options: CreateTabsServiceOptions = {}): TabsS
         if ('closable' in tab || 'fixed' in tab) {
           existing.closable = tab.closable ?? !existing.fixed
         }
+        if (!wasFixed && isFixedTab(existing)) {
+          moveExistingTab(existing.path, fixedCount() - 1)
+        } else if (wasFixed && !isFixedTab(existing)) {
+          moveExistingTab(existing.path, fixedCount())
+        }
         return cloneTab(existing)
       }
 
       const nextTab = normalizeTab(tab)
       tabs.push(nextTab)
+      if (isFixedTab(nextTab)) {
+        moveExistingTab(nextTab.path, fixedCount() - 1)
+      }
       return cloneTab(nextTab)
+    },
+
+    moveTab(path, targetPath) {
+      if (path === targetPath) {
+        return true
+      }
+
+      const sourceIndex = tabs.findIndex((tab) => tab.path === path)
+      const targetIndex = tabs.findIndex((tab) => tab.path === targetPath)
+      if (sourceIndex < 0 || targetIndex < 0) {
+        return false
+      }
+
+      const source = tabs[sourceIndex]
+      const target = tabs[targetIndex]
+      const sourceFixed = isFixedTab(source)
+      const targetFixed = isFixedTab(target)
+
+      if (sourceFixed && !targetFixed) {
+        return false
+      }
+
+      const [removed] = tabs.splice(sourceIndex, 1)
+      let nextIndex = tabs.findIndex((tab) => tab.path === targetPath)
+
+      if (sourceFixed) {
+        nextIndex = Math.max(0, Math.min(nextIndex, fixedCount()))
+      } else if (targetFixed) {
+        nextIndex = fixedCount()
+      } else {
+        nextIndex = Math.max(fixedCount(), nextIndex)
+      }
+
+      tabs.splice(nextIndex, 0, removed)
+      return true
     },
 
     closeCurrent(path) {
@@ -93,6 +138,21 @@ export function createTabsService(options: CreateTabsServiceOptions = {}): TabsS
       const tab = tabs.find((item) => item.path === path)
       return tab ? cloneTab(tab) : undefined
     },
+  }
+
+  function fixedCount() {
+    return tabs.filter(isFixedTab).length
+  }
+
+  function moveExistingTab(path: string, index: number) {
+    const currentIndex = tabs.findIndex((tab) => tab.path === path)
+    if (currentIndex < 0) {
+      return
+    }
+
+    const [tab] = tabs.splice(currentIndex, 1)
+    const nextIndex = Math.max(0, Math.min(index, tabs.length))
+    tabs.splice(nextIndex, 0, tab)
   }
 
   function removeTabs(predicate: (tab: AdminTab, index: number) => boolean) {

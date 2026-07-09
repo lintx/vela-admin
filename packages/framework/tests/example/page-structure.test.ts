@@ -2,7 +2,8 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-const pagesRoot = resolve(__dirname, '../../../../examples/admin/src/pages')
+const exampleRoot = resolve(__dirname, '../../../../examples/admin/src')
+const pagesRoot = resolve(exampleRoot, 'pages')
 
 describe('example page structure', () => {
   it('keeps only reserved flat pages at the root and groups demos by domain directories', () => {
@@ -39,6 +40,13 @@ describe('example page structure', () => {
     expect(readFileSync(resolve(pagesRoot, 'errors/500.vue'), 'utf8')).toContain("path: '/exception/500'")
   })
 
+  it('eagerly loads error pages so inline route records are available', () => {
+    const source = readFileSync(resolve(exampleRoot, 'main.js'), 'utf8')
+
+    expect(source).toContain("'!./pages/errors/**/*.vue'")
+    expect(source).toContain("'./pages/errors/**/*.vue'")
+    expect(source).toContain('specialRoutes')
+  })
   it('keeps the physical 404 fallback under errors while hooking unknown routes globally', () => {
     const source = readFileSync(resolve(pagesRoot, 'errors/[...path].vue'), 'utf8')
 

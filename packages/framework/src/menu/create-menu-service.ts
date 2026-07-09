@@ -46,19 +46,14 @@ export interface MenuService {
 interface MenuNode extends AdminMenuItem {
   parent?: MenuNode
   children: MenuNode[]
+  public?: boolean
+  specialRoute?: unknown
 }
 
 export function createMenuService(options: CreateMenuServiceOptions): MenuService {
-  const visibleRoutes = options.routes
-    .filter((route) => hasMenuTitle(route))
-    .filter((route) => canAccessRoute(route, options.permission))
-    .sort(compareRoutes)
-  const visibleMenuMeta = (options.menuMeta ?? [])
-    .filter((meta) => canAccessMenuMeta(meta, options.permission))
-
   const nodes = [
-    ...visibleMenuMeta.map(createMenuMetaNode),
-    ...visibleRoutes.map(createMenuNode),
+    ...(options.menuMeta ?? []).map(createMenuMetaNode),
+    ...options.routes.filter((route) => hasMenuTitle(route)).map(createMenuNode),
   ]
   const nodeMap = new Map<string, MenuNode>()
 
@@ -89,9 +84,14 @@ export function createMenuService(options: CreateMenuServiceOptions): MenuServic
     }
   })
 
+  menuNodes
+    .filter((node) => !node.parent)
+    .forEach((node) => inheritNodePermission(node))
+
   const menus = menuNodes
-    .filter((node) => !node.parent && !node.hidden)
-    .map(toPublicMenu)
+    .filter((node) => !node.parent)
+    .map((node) => toPublicMenu(node, options.permission))
+    .filter((menu): menu is AdminMenuItem => Boolean(menu))
   const diagnostics = createDiagnostics(menus)
 
   return {
@@ -123,30 +123,6 @@ function hasMenuTitle(route: RouteRecordRaw) {
   return typeof route.meta?.title === 'string'
 }
 
-function canAccessRoute(route: RouteRecordRaw, permission?: PermissionService) {
-  const requiredPermission = route.meta?.permission
-
-  if (!permission || !requiredPermission) {
-    return true
-  }
-
-  if (typeof requiredPermission === 'string' || Array.isArray(requiredPermission)) {
-    return permission.hasPermission(requiredPermission)
-  }
-
-  return true
-}
-
-function canAccessMenuMeta(meta: AdminMenuMeta, permission?: PermissionService) {
-  const requiredPermission = meta.permission
-
-  if (!permission || !requiredPermission) {
-    return true
-  }
-
-  return permission.hasPermission(requiredPermission)
-}
-
 function createMenuNode(route: RouteRecordRaw): MenuNode {
   return {
     path: route.path,
@@ -157,6 +133,8 @@ function createMenuNode(route: RouteRecordRaw): MenuNode {
     hidden: Boolean(route.meta?.hidden),
     activeMenu: typeof route.meta?.activeMenu === 'string' ? route.meta.activeMenu : undefined,
     navigable: true,
+    public: route.meta?.public === true,
+    specialRoute: route.meta?.specialRoute,
     children: [],
   }
 }
@@ -175,16 +153,34 @@ function createMenuMetaNode(meta: AdminMenuMeta): MenuNode {
   }
 }
 
-function normalizePermission(permission: unknown) {
+function normalizePermission(permission: unknown): string[] | undefined {
   if (typeof permission === 'string') {
-    return permission
+    return [permission]
   }
 
   if (Array.isArray(permission)) {
-    return permission.filter((item): item is string => typeof item === 'string')
+    const permissions = permission.filter((item): item is string => typeof item === 'string')
+    return permissions.length > 0 ? permissions : undefined
   }
 
   return undefined
+}
+
+function mergePermissions(parentPermission?: string | string[], ownPermission?: string | string[]) {
+  const permissions = [
+    ...(Array.isArray(parentPermission) ? parentPermission : parentPermission ? [parentPermission] : []),
+    ...(Array.isArray(ownPermission) ? ownPermission : ownPermission ? [ownPermission] : []),
+  ]
+
+  return permissions.length > 0 ? Array.from(new Set(permissions)) : undefined
+}
+
+function inheritNodePermission(node: MenuNode, parentPermission?: string | string[]) {
+  node.permission = node.public || node.specialRoute
+    ? normalizePermission(node.permission)
+    : mergePermissions(parentPermission, node.permission)
+
+  node.children.forEach((child) => inheritNodePermission(child, node.permission))
 }
 
 function findParentNode(node: MenuNode, nodeMap: Map<string, MenuNode>) {
@@ -206,17 +202,6 @@ function createParentPaths(path: string) {
   return parentPaths
 }
 
-function compareRoutes(a: RouteRecordRaw, b: RouteRecordRaw) {
-  const orderA = Number(a.meta?.order ?? 0)
-  const orderB = Number(b.meta?.order ?? 0)
-
-  if (orderA !== orderB) {
-    return orderA - orderB
-  }
-
-  return a.path.localeCompare(b.path)
-}
-
 function compareMenuNodes(a: MenuNode, b: MenuNode) {
   if (a.order !== b.order) {
     return a.order - b.order
@@ -225,11 +210,19 @@ function compareMenuNodes(a: MenuNode, b: MenuNode) {
   return a.path.localeCompare(b.path)
 }
 
-function toPublicMenu(node: MenuNode): AdminMenuItem {
+function toPublicMenu(node: MenuNode, permission?: PermissionService): AdminMenuItem | undefined {
+  if (node.hidden || !canAccessNode(node, permission)) {
+    return undefined
+  }
+
   const children = node.children
-    .filter((child) => !child.hidden)
     .sort((a, b) => a.order - b.order || a.path.localeCompare(b.path))
-    .map(toPublicMenu)
+    .map((child) => toPublicMenu(child, permission))
+    .filter((child): child is AdminMenuItem => Boolean(child))
+
+  if (!node.navigable && children.length === 0) {
+    return undefined
+  }
 
   return {
     path: node.path,
@@ -243,6 +236,14 @@ function toPublicMenu(node: MenuNode): AdminMenuItem {
     firstNavigableChildPath: findFirstNavigableChildPath(children),
     children,
   }
+}
+
+function canAccessNode(node: MenuNode, permission?: PermissionService) {
+  if (node.public || node.specialRoute || !node.permission || !permission) {
+    return true
+  }
+
+  return permission.hasPermission(node.permission)
 }
 
 function findFirstNavigableChildPath(children: AdminMenuItem[]): string | undefined {

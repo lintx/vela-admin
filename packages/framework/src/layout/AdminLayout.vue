@@ -73,6 +73,7 @@ const emit = defineEmits<{
   closeAllTabs: []
   refreshTab: [path: string]
   pinTab: [path: string]
+  reorderTab: [path: string, targetPath: string]
   maximizeTabs: []
   restoreTabs: []
   closeHeaderTools: []
@@ -216,6 +217,7 @@ onBeforeUnmount(() => {
     @close-all-tabs="emit('closeAllTabs')"
     @refresh-tab="emit('refreshTab', $event)"
     @pin-tab="emit('pinTab', $event)"
+    @reorder-tab="(path, targetPath) => emit('reorderTab', path, targetPath)"
     @maximize-tabs="emit('maximizeTabs')"
     @restore-tabs="emit('restoreTabs')"
   >

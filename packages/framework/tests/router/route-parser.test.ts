@@ -120,6 +120,16 @@ describe('parseAdminRoutes', () => {
       order: 10,
     })
   })
+  it('inherits permissions from parent meta paths cumulatively', () => {
+    const routes = parseAdminRoutes({
+      './pages/demo.meta.js': metaFile({ title: '多级示例', permission: 'demo:view' }),
+      './pages/demo.level1.meta.js': metaFile({ title: '一级目录', permission: 'demo:level' }),
+      './pages/demo.level1.leaf.vue': pageComponent('Leaf'),
+      './pages/demo.level1.leaf.meta.js': metaFile({ title: '叶子页面', permission: 'demo:read' }),
+    })
+
+    expect(routes[0].meta?.permission).toEqual(['demo:view', 'demo:level', 'demo:read'])
+  })
 
   it('throws diagnostics for duplicate paths', () => {
     expect(() => parseAdminRoutes({
@@ -163,6 +173,27 @@ describe('defineRouteMeta', () => {
 })
 
 describe('createAdminRouter', () => {
+  it('marks registered special routes as public', () => {
+    const router = createAdminRouter({
+      pages: {
+        './pages/errors/403.vue': pageComponentWithRoute('Forbidden', {
+          path: '/exception/403',
+          name: 'exception-403',
+        }),
+      },
+      history: createMemoryHistory('/'),
+      specialRoutes: [
+        { path: '/exception/403', type: 'forbidden' },
+      ],
+    })
+
+    const route = router.getRoutes().find((item) => item.path === '/exception/403')
+
+    expect(route?.meta).toMatchObject({
+      public: true,
+      specialRoute: 'forbidden',
+    })
+  })
   it('creates a router from parsed pages and preserves configured history base', () => {
     const router = createAdminRouter({
       pages: {
