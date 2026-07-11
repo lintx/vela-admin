@@ -17,6 +17,7 @@ import {
 } from 'vela-admin/permission'
 import {
   applyAdminTheme,
+  createAdminThemeModeTransition,
   createAdminTheme,
   createSourceColorAdminTheme,
 } from 'vela-admin/theme'
@@ -101,6 +102,10 @@ const layoutModeText = computed(() => {
   return names[layoutMode.value] ?? layoutMode.value
 })
 const unreadNotificationCount = computed(() => notifications.value.filter(item => item.unread).length)
+const toggleThemeMode = createAdminThemeModeTransition({
+  getMode: () => themeMode.value,
+  setMode: updateThemeMode,
+})
 
 applyAdminTheme(createThemeFromState())
 syncCurrentTab()
@@ -592,45 +597,6 @@ function updateThemeMode(mode) {
   commitAdminSettings()
 }
 
-function toggleThemeMode(event) {
-  const nextMode = themeMode.value === 'light' ? 'dark' : 'light'
-  runThemeModeTransition(event, () => updateThemeMode(nextMode))
-}
-
-function runThemeModeTransition(event, update) {
-  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  if (!document.startViewTransition || reduceMotion) {
-    update()
-    return
-  }
-
-  const target = event.currentTarget
-  const rect = target instanceof HTMLElement ? target.getBoundingClientRect() : null
-  const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2
-  const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 2
-  const endRadius = Math.hypot(
-    Math.max(x, window.innerWidth - x),
-    Math.max(y, window.innerHeight - y),
-  )
-  const transition = document.startViewTransition(update)
-
-  transition.ready.then(() => {
-    document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${endRadius}px at ${x}px ${y}px)`,
-        ],
-      },
-      {
-        duration: 420,
-        easing: 'cubic-bezier(.2, 0, 0, 1)',
-        pseudoElement: '::view-transition-new(root)',
-      },
-    )
-  })
-}
-
 function markAllNotificationsRead() {
   notifications.value = notifications.value.map(item => ({ ...item, unread: false }))
 }
@@ -750,7 +716,7 @@ watch(layoutFeatures, commitAdminSettings, { deep: true })
           <VaIcon library="tabler" name="brand-github" :size="22" />
           <span class="admin-preview__tool-label admin-preview__tool-label--adaptive">GitHub</span>
         </var-button>
-        <var-button class="admin-preview__tool-button" text @click="toggleThemeMode($event)">
+        <var-button class="admin-preview__tool-button" text @click="toggleThemeMode">
           <VaIcon :name="themeMode === 'light' ? 'moon' : 'sun'" :size="22" />
           <span class="admin-preview__tool-label admin-preview__tool-label--adaptive">
             {{ themeMode === 'light' ? '深色' : '浅色' }}
@@ -1183,19 +1149,6 @@ watch(layoutFeatures, commitAdminSettings, { deep: true })
 
   .admin-preview__menu-panel {
     width: 100%;
-  }
-}
-
-:global(::view-transition-old(root)),
-:global(::view-transition-new(root)) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :global(::view-transition-old(root)),
-  :global(::view-transition-new(root)) {
-    animation: none;
   }
 }
 

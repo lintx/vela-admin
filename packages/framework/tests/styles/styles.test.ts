@@ -21,5 +21,8 @@ describe('framework styles', () => {
     expect(css).toContain('scrollbar-width: thin;')
     expect(css).toContain('.va-admin-layout--scrollbar-hover .va-admin-scrollbar')
     expect(css).toContain('.va-admin-layout--scrollbar-native .va-admin-scrollbar')
+    expect(css).toContain('::view-transition-new(root)')
+    expect(css).toContain('mix-blend-mode: normal;')
+    expect(css).toContain('prefers-reduced-motion: reduce')
   })
 })

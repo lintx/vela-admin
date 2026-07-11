@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vela-admin-demo",
+  "compatibility_date": "2026-07-11",
+  "assets": {
+    "directory": "./examples/admin/dist",
+    "not_found_handling": "single-page-application"
+  }
+}

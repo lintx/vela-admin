@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue'
 
 import type { AdminLayoutMode, AdminScrollbarMode, AdminThemeBase, AdminThemeMode, ThemeColorChip } from '../../index'
+import { createAdminThemeModeTransition } from '../../theme'
 import { layoutModes, presetThemeColors, scrollbarModes, themeBases, themeModes } from './admin-settings-drawer-options'
 
 type ThemeColorOption = ThemeColorChip & { custom?: boolean }
@@ -85,6 +86,12 @@ function updateThemeMode(mode: AdminThemeMode) {
   emit('update:themeMode', mode)
   emit('update:themeBase', nextBase)
 }
+
+const updateThemeModeWithTransition = createAdminThemeModeTransition<AdminThemeMode>({
+  getMode: () => props.themeMode,
+  setMode: updateThemeMode,
+  modes: ['light', 'dark'],
+})
 
 function updateSidebarWidth(value: number | string) {
   const nextValue = Number(value)
@@ -244,7 +251,7 @@ onBeforeUnmount(() => {
           :checkmark="false"
           :model-value="themeMode"
           :options="themeModes"
-          @update:model-value="updateThemeMode($event as AdminThemeMode)"
+          @update:model-value="updateThemeModeWithTransition.to($event as AdminThemeMode)"
         />
       </div>
       <div class="va-admin-settings-drawer__theme-group">

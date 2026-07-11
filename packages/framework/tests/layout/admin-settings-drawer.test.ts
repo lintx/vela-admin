@@ -9,6 +9,8 @@ import { globalStubs, layoutProps, mockViewport, resetLayoutTestDom } from './ad
 afterEach(resetLayoutTestDom)
 afterEach(() => {
   vi.useRealTimers()
+  delete (document as Document & { startViewTransition?: unknown }).startViewTransition
+  delete (document.documentElement as HTMLElement & { animate?: unknown }).animate
 })
 
 describe('AdminLayout settings drawer', () => {
@@ -109,6 +111,35 @@ describe('AdminLayout settings drawer', () => {
 
     await wrapper.find('[aria-label="选择自定义青绿"]').trigger('click')
     expect(wrapper.emitted('update:sourceColor')?.at(-1)).toEqual(['#10B981'])
+  })
+
+  it('updates theme mode from settings drawer through the shared theme transition', async () => {
+    mockViewport(false)
+    const transition = { ready: Promise.resolve() }
+    const animate = vi.fn()
+    const startViewTransition = vi.fn((callback: () => void) => {
+      callback()
+      return transition
+    })
+    ;(document as Document & { startViewTransition?: typeof startViewTransition }).startViewTransition = startViewTransition
+    document.documentElement.animate = animate
+
+    const wrapper = mount(AdminLayout, {
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    await wrapper.find('[data-testid="admin-theme-mode-segments"]').trigger('click')
+    await transition.ready
+
+    expect(startViewTransition).toHaveBeenCalledTimes(1)
+    expect(wrapper.emitted('update:themeMode')?.at(-1)).toEqual(['light'])
+    expect(wrapper.emitted('update:themeBase')?.at(-1)).toEqual(['md3Light'])
+    expect(animate).toHaveBeenCalled()
   })
 
   it('keeps settings drawer as a square native drawer surface', () => {
@@ -217,4 +248,3 @@ describe('AdminLayout settings drawer', () => {
     expect(wrapper.emitted('update:sidebarWidth')?.at(-1)).toEqual([300])
   })
 })
-

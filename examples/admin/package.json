@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:cloudflare-pages": "vite build --mode cloudflare-pages",
     "preview": "vite preview",
     "enable:auto-import": "node scripts/enable-auto-import.js"
   },

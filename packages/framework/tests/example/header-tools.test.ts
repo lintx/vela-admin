@@ -34,17 +34,19 @@ describe('example header tools', () => {
     expect(source).not.toContain('type="primary" @click="applyCurrentTheme"')
   })
 
-  it('uses a button-origin view transition for theme mode switching', () => {
+  it('delegates button-origin theme transition details to the framework', () => {
     const source = readFileSync(
       resolve(__dirname, '../../../../examples/admin/src/App.vue'),
       'utf8',
     )
 
-    expect(source).toContain('toggleThemeMode($event)')
-    expect(source).toContain('runThemeModeTransition')
-    expect(source).toContain('document.startViewTransition')
-    expect(source).toContain('::view-transition-new(root)')
-    expect(source).toContain('prefers-reduced-motion: reduce')
+    expect(source).toContain('@click="toggleThemeMode"')
+    expect(source).toContain('createAdminThemeModeTransition')
+    expect(source).not.toContain('toggleThemeMode($event)')
+    expect(source).not.toContain('runAdminThemeTransition')
+    expect(source).not.toContain('document.startViewTransition')
+    expect(source).not.toContain('::view-transition-new(root)')
+    expect(source).not.toContain('prefers-reduced-motion: reduce')
   })
 
   it('keeps generated theme preview in a floating review bar before applying', () => {

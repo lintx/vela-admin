@@ -26,6 +26,20 @@ export {
   type ThemeStyleTarget,
 } from './theme-provider'
 export {
+  createAdminThemeModeTransition,
+  runAdminThemeTransition,
+  resolveAdminThemeTransitionClipPath,
+  type AdminThemeModeTransitionHandler,
+  type AdminThemeTransitionDocument,
+  type AdminThemeTransitionRect,
+  type AdminThemeTransitionTarget,
+  type AdminThemeTransitionWindow,
+  type CreateAdminThemeModeTransitionOptions,
+  type RunAdminThemeTransitionOptions,
+  type ResolveAdminThemeTransitionClipPathOptions,
+  type ResolvedAdminThemeTransitionClipPath,
+} from './theme-transition'
+export {
   adminTokenToCssVariables,
   defaultAdminTokens,
   type AdminScrollbarMode,

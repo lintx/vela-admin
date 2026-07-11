@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter vela-admin-example dev",
     "build": "pnpm --filter vela-admin build && pnpm --filter vela-admin-example build",
+    "build:cloudflare-pages": "pnpm --filter vela-admin-example build:cloudflare-pages",
     "test": "pnpm --filter vela-admin test && pnpm run test:create",
     "test:create": "node --test packages/create-vela-admin/tests/create-cli.test.js scripts/package-command.test.js",
     "create": "node packages/create-vela-admin/src/index.js",

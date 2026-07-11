@@ -76,8 +76,7 @@ function createExampleMenuService() {
     getMenus() {
       const menus = service.getMenus()
 
-      // 仅在开发环境追加超长菜单，方便验证收缩侧栏浮层的滚动边界。
-      return import.meta.env.DEV ? [...menus, createOverflowMenu()] : menus
+      return [...menus, createOverflowMenu()]
     },
 
     getDiagnostics() {
