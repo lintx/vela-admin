@@ -2,6 +2,10 @@
 
 Vela Admin 的项目生成器，用于创建基于 Vue 3、Vite、Varlet UI 和 `vela-admin` 的后台应用模板。
 
+## 在线演示
+
+- [Vela Admin 在线预览](https://demo.vela.pub/)
+
 ## 使用
 
 ```sh
