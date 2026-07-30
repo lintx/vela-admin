@@ -153,6 +153,9 @@ const app = createAdminApp({
     theme: {
       developerTools: true,
     },
+    settings: {
+      storageKey: 'vela-admin-example:settings',
+    },
   }),
   plugins: [Varlet],
 })

@@ -7,6 +7,16 @@ export type AdminLayoutMode = 'side' | 'top' | 'mixed'
 export type AdminResolvedThemeMode = 'light' | 'dark'
 export type AdminThemeMode = 'system' | AdminResolvedThemeMode
 
+export interface AdminThemeColor {
+  color: string
+  label: string
+  removable?: boolean
+}
+
+export interface AdminTabsConfig {
+  fixedTabs?: Array<{ path: string; title: string }>
+}
+
 export interface AdminLayoutConfig {
   mode: AdminLayoutMode
   sidebarWidth: number
@@ -34,11 +44,13 @@ export interface AdminThemeConfig {
   persist: boolean
   developerTools: boolean
   sourceColor: string
+  customColors?: AdminThemeColor[]
 }
 
 export interface AdminSettingsConfig {
   persist: boolean
   storageKey: string
+  schemaVersion?: number
 }
 
 export interface AdminPermissionConfig {
@@ -52,6 +64,7 @@ export interface AdminConfig {
   icons: AdminIconConfig
   layout: AdminLayoutConfig
   theme: AdminThemeConfig
+  tabs?: AdminTabsConfig
   settings: AdminSettingsConfig
   permission: AdminPermissionConfig
 }
@@ -85,6 +98,10 @@ export function mergeAdminConfig(config: AdminConfigInput = {}): AdminConfig {
     theme: {
       ...defaultAdminConfig.theme,
       ...(config.theme ?? {}),
+    },
+    tabs: {
+      ...defaultAdminConfig.tabs,
+      ...(config.tabs ?? {}),
     },
     settings: {
       ...defaultAdminConfig.settings,

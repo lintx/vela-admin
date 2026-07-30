@@ -32,10 +32,30 @@ export {
   type ThemeStyleTarget,
 } from './theme/theme-provider'
 export {
+  useAdminTheme,
+  type AdminGeneratedThemePayload,
+  type AdminThemeApply,
+  type AdminThemeColorInput,
+  type AdminThemeController,
+  type AdminThemeStateInput,
+  type UseAdminThemeOptions,
+} from './theme/use-admin-theme'
+export {
+  useThemePreview,
+  type AdminThemePreviewController,
+  type AdminThemePreviewPayload,
+  type UseThemePreviewOptions,
+} from './theme/use-theme-preview'
+export {
   createAdminApp,
   type AdminAppContext,
   type CreateAdminAppOptions,
 } from './app/create-admin-app'
+export {
+  adminAppInjectionKey,
+  useAdminApp,
+  useAdminSettings,
+} from './app/use-admin-app'
 export {
   defineAdminConfig,
   mergeAdminConfig,
@@ -46,6 +66,8 @@ export {
   type AdminPermissionConfig,
   type AdminResolvedThemeMode,
   type AdminSettingsConfig,
+  type AdminTabsConfig,
+  type AdminThemeColor,
   type AdminThemeConfig,
   type AdminThemeMode,
 } from './app/define-admin-config'
@@ -74,6 +96,11 @@ export {
   type CreateSettingsServiceOptions,
   type SettingsService,
 } from './settings/create-settings-service'
+export type {
+  SettingsSyncAdapter,
+  SettingsSyncErrorContext,
+  SettingsSyncStatus,
+} from './settings/settings-sync-types'
 export {
   defineRouteMeta,
   type AdminRouteMeta,
@@ -137,6 +164,11 @@ export {
   type TabsService,
 } from './tabs/create-tabs-service'
 export {
+  useAdminTabs,
+  type AdminTabsController,
+  type UseAdminTabsOptions,
+} from './tabs/use-admin-tabs'
+export {
   default as AdminSidebar,
 } from './layout/components/AdminSidebar.vue'
 export {
@@ -183,6 +215,9 @@ export {
   type AdminThemeGeneratorPayload,
   type ThemeColorChip,
 } from './layout/components/AdminThemeGenerator.vue'
+export {
+  default as AdminThemePreviewBar,
+} from './layout/components/AdminThemePreviewBar.vue'
 export {
   default as VaContextMenu,
 } from './components/context-menu/VaContextMenu.vue'

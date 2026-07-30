@@ -319,6 +319,34 @@ describe('VaSortable', () => {
     expect(wrapper.findAll('[data-list="primary"] [data-sortable-item]').some(item => item.element.style.transform)).toBe(true)
   })
 
+  it('cleans pending item move animations when unmounted', async () => {
+    installPointerEvent()
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      callback(0)
+      return 1
+    })
+    const clearTimeout = vi.spyOn(window, 'clearTimeout')
+    const wrapper = mountSortableBoard({ strategy: 'row-grid' })
+
+    mockResponsiveGridRects(wrapper, { columns: 3, rowGap: 20 })
+
+    await pointerDown(wrapper, 'a', 10, 10)
+    window.dispatchEvent(pointerEvent('pointermove', 270, 20))
+    await nextTick()
+    await nextTick()
+
+    const animatedElements = wrapper.findAll('[data-list="primary"] [data-sortable-item]')
+      .map(item => item.element as HTMLElement & { __vaSortableAnimationCleanup?: () => void })
+      .filter(element => element.__vaSortableAnimationCleanup)
+    expect(animatedElements.length).toBeGreaterThan(0)
+
+    clearTimeout.mockClear()
+    wrapper.unmount()
+
+    expect(clearTimeout).toHaveBeenCalledTimes(animatedElements.length)
+    expect(animatedElements.every(element => element.__vaSortableAnimationCleanup === undefined)).toBe(true)
+  })
+
   it('renders one independent bordered placeholder for a single dragged item', async () => {
     installPointerEvent()
     const wrapper = mountSortableBoard({ strategy: 'row-grid' })

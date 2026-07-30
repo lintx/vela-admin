@@ -6,6 +6,7 @@ export interface AdminTab {
 }
 
 export interface CreateTabsServiceOptions {
+  /** @deprecated 该选项不影响标签状态；请通过 fixedTabs 显式传入首页标签。 */
   homePath?: string
   fixedTabs?: AdminTab[]
 }
@@ -169,7 +170,7 @@ export function createTabsService(options: CreateTabsServiceOptions = {}): TabsS
   }
 }
 
-function normalizeFixedTabs(tabs: AdminTab[]) {
+function normalizeFixedTabs(tabs: AdminTab[]): AdminTab[] {
   return tabs.map((tab) => ({
     ...normalizeTab(tab),
     fixed: true,

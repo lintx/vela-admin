@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, watch } from 'vue'
 
 import type { AdminLayoutMode, AdminScrollbarMode, AdminThemeBase, AdminThemeMode, ThemeColorChip } from '../../index'
-import { createAdminThemeModeTransition } from '../../theme'
+import type { AdminThemeTransitionTarget } from '../../theme/theme-transition'
 import { layoutModes, presetThemeColors, scrollbarModes, themeBases, themeModes } from './admin-settings-drawer-options'
 
 type ThemeColorOption = ThemeColorChip & { custom?: boolean }
@@ -35,7 +35,7 @@ const emit = defineEmits<{
   'update:scrollbar': [value: AdminScrollbarMode]
   'update:tagsView': [value: boolean]
   'update:themeBase': [value: AdminThemeBase]
-  'update:themeMode': [value: AdminThemeMode]
+  'update:themeMode': [mode: AdminThemeMode, target?: AdminThemeTransitionTarget | null]
   'update:sourceColor': [value: string]
   openThemeGenerator: []
 }>()
@@ -44,6 +44,8 @@ const themeBaseFamily = computed(() => props.themeBase.startsWith('md3') ? 'md3L
 const bodyRef = ref<HTMLElement | null>(null)
 const sidebarWidthValue = ref(props.sidebarWidth)
 let sliderReflowTimer: ReturnType<typeof window.setTimeout> | undefined
+let themeModeTransitionTarget: AdminThemeTransitionTarget | null = null
+let themeModeTransitionTargetVersion = 0
 const themeColorOptions = computed(() => {
   const colors = new Map<string, ThemeColorOption>()
 
@@ -79,19 +81,36 @@ function updateThemeBase(base: AdminThemeBase) {
 }
 
 function updateThemeMode(mode: AdminThemeMode) {
+  const target = themeModeTransitionTarget
+  themeModeTransitionTarget = null
+  themeModeTransitionTargetVersion += 1
   const nextBase = resolveThemeMode(mode) === 'dark'
     ? props.themeBase.replace('Light', 'Dark') as AdminThemeBase
     : props.themeBase.replace('Dark', 'Light') as AdminThemeBase
 
-  emit('update:themeMode', mode)
   emit('update:themeBase', nextBase)
+  emit('update:themeMode', mode, target)
 }
 
-const updateThemeModeWithTransition = createAdminThemeModeTransition<AdminThemeMode>({
-  getMode: () => props.themeMode,
-  setMode: updateThemeMode,
-  modes: ['light', 'dark'],
-})
+function captureThemeModeTransitionTarget(event: Event) {
+  const target = event.target
+  const currentTarget = event.currentTarget
+  const version = ++themeModeTransitionTargetVersion
+
+  if (target instanceof HTMLElement && currentTarget instanceof HTMLElement) {
+    const option = target.closest<HTMLElement>('[role="radio"], button')
+    themeModeTransitionTarget = option && currentTarget.contains(option) ? option : null
+  } else {
+    themeModeTransitionTarget = null
+  }
+
+  // target 仅服务当前 DOM 事件内同步产生的 model update，未完成交互不能污染后续程序更新。
+  queueMicrotask(() => {
+    if (themeModeTransitionTargetVersion === version) {
+      themeModeTransitionTarget = null
+    }
+  })
+}
 
 function updateSidebarWidth(value: number | string) {
   const nextValue = Number(value)
@@ -251,7 +270,11 @@ onBeforeUnmount(() => {
           :checkmark="false"
           :model-value="themeMode"
           :options="themeModes"
-          @update:model-value="updateThemeModeWithTransition.to($event as AdminThemeMode)"
+          @pointerdown.capture="captureThemeModeTransitionTarget"
+          @click.capture="captureThemeModeTransitionTarget"
+          @keydown.capture="captureThemeModeTransitionTarget"
+          @keyup.capture="captureThemeModeTransitionTarget"
+          @update:model-value="updateThemeMode($event as AdminThemeMode)"
         />
       </div>
       <div class="va-admin-settings-drawer__theme-group">

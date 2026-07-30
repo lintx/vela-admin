@@ -8,6 +8,7 @@ import type { AdminLayoutMode, AdminThemeMode } from '../app/define-admin-config
 import type { AdminMenuItem } from '../menu/create-menu-service'
 import type { AdminTab } from '../tabs/create-tabs-service'
 import type { AdminThemeBase } from '../theme/create-theme'
+import type { AdminThemeTransitionTarget } from '../theme/theme-transition'
 import type { AdminScrollbarMode } from '../theme/tokens'
 import AdminMenuSearch from './components/AdminMenuSearch.vue'
 import AdminSettingsDrawer from './components/AdminSettingsDrawer.vue'
@@ -86,7 +87,7 @@ const emit = defineEmits<{
   'update:tagsView': [value: boolean]
   'update:menuSearch': [value: boolean]
   'update:themeBase': [value: AdminThemeBase]
-  'update:themeMode': [value: AdminThemeMode]
+  'update:themeMode': [mode: AdminThemeMode, target?: AdminThemeTransitionTarget | null]
   'update:sourceColor': [value: string]
   openThemeGenerator: []
 }>()
@@ -99,6 +100,10 @@ const settingsOpen = ref(false)
 const mobile = ref(false)
 const mediaQuery = computed(() => `(max-width: ${props.mobileBreakpoint}px)`)
 let mediaList: MediaQueryList | null = null
+
+function emitThemeMode(mode: AdminThemeMode, target?: AdminThemeTransitionTarget | null) {
+  emit('update:themeMode', mode, target)
+}
 
 function syncMobile(matches: boolean) {
   mobile.value = matches
@@ -276,7 +281,7 @@ onBeforeUnmount(() => {
     @update:tags-view="emit('update:tagsView', $event)"
     @update:menu-search="emit('update:menuSearch', $event)"
     @update:theme-base="emit('update:themeBase', $event)"
-    @update:theme-mode="emit('update:themeMode', $event)"
+    @update:theme-mode="emitThemeMode"
     @update:source-color="emit('update:sourceColor', $event)"
     @open-theme-generator="openThemeGenerator"
   />

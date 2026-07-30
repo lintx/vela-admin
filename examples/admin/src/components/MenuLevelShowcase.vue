@@ -1,7 +1,7 @@
 <script setup>
 import { VaIcon } from 'vela-admin/components'
 
-const props = defineProps({
+defineProps({
   active: {
     type: Number,
     required: true,

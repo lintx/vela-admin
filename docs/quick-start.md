@@ -117,6 +117,30 @@ createAdminApp({
 }).mount('#app')
 ```
 
+根组件或其后代组件可以通过 `useAdminSettings()` 读取和更新当前设置：
+
+```vue
+<script setup>
+import { computed } from 'vue'
+import { useAdminSettings } from 'vela-admin/app'
+
+const settings = useAdminSettings()
+const layoutMode = computed(() => settings.settings.value.layout.mode)
+
+function switchToTopLayout() {
+  settings.updateSettings({ layout: { mode: 'top' } })
+}
+</script>
+
+<template>
+  <var-button @click="switchToTopLayout">
+    切换顶部布局（当前：{{ layoutMode }}）
+  </var-button>
+</template>
+```
+
+设置默认只保存在本地。服务端同步是可选能力，只有业务需要跨设备保存偏好时，才在 `createAdminApp()` 中提供 `settings.sync`；完整契约见 [配置参考](configuration.md#本地持久化与服务端同步)。
+
 ## 添加页面
 
 新增页面时，创建页面组件和同名 meta 文件：

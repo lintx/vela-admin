@@ -237,6 +237,13 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  const root = getContextRoot(context)
+  if (root) {
+    for (const element of getItemElements(root)) {
+      const animatedElement = element as AnimatedSortableElement
+      animatedElement.__vaSortableAnimationCleanup?.()
+    }
+  }
   sortableContexts.delete(props.listId)
   if (activeDrag?.sourceListId === props.listId || activeDrag?.currentListId === props.listId) {
     cancelDrag()

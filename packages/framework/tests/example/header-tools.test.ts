@@ -1,93 +1,159 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { defineComponent, h, ref, type ComponentPublicInstance } from 'vue'
+import { mount, type VueWrapper } from '@vue/test-utils'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import { mockAuthInjectionKey } from '../../../../examples/admin/src/mock-auth'
+import AppHeaderTools from '../../../../examples/admin/src/components/AppHeaderTools.vue'
+
+interface AppHeaderToolsExposed {
+  closeMenus(): void
+}
+
+type AppHeaderToolsWrapper = VueWrapper<ComponentPublicInstance & AppHeaderToolsExposed>
 
 describe('example header tools', () => {
-  it('provides notification and user menus without the old apply button', () => {
-    const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/App.vue'),
-      'utf8',
-    )
+  const mountedWrappers: VueWrapper[] = []
 
-    expect(source).toContain('const notifications = ref')
-    expect(source).toContain('const notificationMenuOpen = ref(false)')
-    expect(source).toContain('const userMenuOpen = ref(false)')
-    expect(source).toContain('admin-preview__notification-menu')
-    expect(source).toContain('admin-preview__user-menu')
-    expect(source).toContain('<var-menu')
-    expect(source).toContain('<var-list class="admin-preview__notification-list" finished>')
-    expect(source).toContain('ripple')
-    expect(source).not.toContain(':teleport="false"')
-    expect(source).toContain('<var-badge')
-    expect(source).toContain(':value="unreadNotificationCount"')
-    expect(source).toContain(':hidden="!unreadNotificationCount"')
-    expect(source).toContain('markAllNotificationsRead')
-    expect(source).toContain('function closeHeaderToolMenus()')
-    expect(source).toContain('headerToolMenuVersion.value += 1')
-    expect(source).toContain(':key="`notification-${headerToolMenuVersion}`"')
-    expect(source).toContain(':key="`user-${headerToolMenuVersion}`"')
-    expect(source).toContain('@close-header-tools="closeHeaderToolMenus"')
-    expect(source).toContain('openNotification(item)')
-    expect(source).toContain('openPreferenceSettings')
-    expect(source).not.toContain('admin-preview__popover-scrim')
-    expect(source).not.toContain('admin-preview__notification-badge')
-    expect(source).not.toContain('type="primary" @click="applyCurrentTheme"')
+  afterEach(() => {
+    mountedWrappers.splice(0).forEach(wrapper => wrapper.unmount())
+    vi.restoreAllMocks()
   })
 
-  it('delegates button-origin theme transition details to the framework', () => {
-    const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/App.vue'),
-      'utf8',
-    )
+  async function mountHeader(props = {}) {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes: [
+        { path: '/', component: { render: () => h('main') } },
+        { path: '/system/user', component: { render: () => h('main') } },
+        { path: '/permission/button', component: { render: () => h('main') } },
+        { path: '/login', component: { render: () => h('main') } },
+      ],
+    })
+    await router.push('/')
+    await router.isReady()
 
-    expect(source).toContain('@click="toggleThemeMode"')
-    expect(source).toContain('createAdminThemeModeTransition')
-    expect(source).not.toContain('toggleThemeMode($event)')
-    expect(source).not.toContain('runAdminThemeTransition')
-    expect(source).not.toContain('document.startViewTransition')
-    expect(source).not.toContain('::view-transition-new(root)')
-    expect(source).not.toContain('prefers-reduced-motion: reduce')
+    const auth = {
+      session: ref({ user: { name: '管理员', title: '系统管理员' } }),
+      logout: vi.fn(),
+    }
+    const wrapper = mount(AppHeaderTools, {
+      props: {
+        layoutMode: 'side',
+        themeMode: 'light',
+        ...props,
+      },
+      global: {
+        plugins: [router],
+        provide: {
+          [mockAuthInjectionKey]: auth,
+        },
+        stubs: {
+          VaIcon: defineComponent({
+            props: { name: String },
+            template: '<span class="va-icon-stub" :data-name="name"><slot /></span>',
+          }),
+          VarButton: defineComponent({
+            inheritAttrs: false,
+            emits: ['click'],
+            setup(_, { attrs, emit, slots }) {
+              return () => h('button', {
+                ...attrs,
+                type: 'button',
+                onClick: (event: Event) => emit('click', event),
+              }, slots.default?.())
+            },
+          }),
+          VarMenu: defineComponent({
+            props: { show: Boolean },
+            emits: ['update:show', 'open'],
+            setup(props, { emit, slots }) {
+              const open = () => {
+                emit('update:show', true)
+                emit('open')
+              }
+
+              return () => h('div', { class: 'var-menu-stub', onClick: open }, [
+                slots.default?.(),
+                props.show ? h('div', { class: 'var-menu-stub__content' }, slots.menu?.()) : null,
+              ])
+            },
+          }),
+          VarBadge: defineComponent({
+            inheritAttrs: false,
+            props: { hidden: Boolean, value: [String, Number] },
+            setup(props, { attrs, slots }) {
+              return () => props.hidden
+                ? h('span', slots.default?.())
+                : h('span', { ...attrs, 'data-testid': attrs['data-testid'] }, [
+                    h('span', { class: 'var-badge-stub__value' }, String(props.value ?? '')),
+                    slots.default?.(),
+                  ])
+            },
+          }),
+          VarList: defineComponent({ setup(_, { slots }) { return () => h('div', slots.default?.()) } }),
+          VarCell: defineComponent({
+            inheritAttrs: false,
+            props: { title: String, description: String },
+            emits: ['click', 'keydown'],
+            setup(props, { attrs, emit, slots }) {
+              return () => h('button', {
+                ...attrs,
+                type: 'button',
+                onClick: (event: Event) => emit('click', event),
+                onKeydown: (event: KeyboardEvent) => emit('keydown', event),
+              }, [slots.icon?.(), h('span', props.title), props.description ? h('small', props.description) : null])
+            },
+          }),
+          VarDivider: defineComponent({ template: '<hr />' }),
+        },
+      },
+    })
+    const headerWrapper = wrapper as unknown as AppHeaderToolsWrapper
+    mountedWrappers.push(headerWrapper)
+    return { wrapper: headerWrapper, router, auth }
+  }
+
+  it('renders notification and user tools and marks notifications read through menu slots', async () => {
+    const { wrapper } = await mountHeader()
+
+    expect(wrapper.text()).toContain('通知')
+    expect(wrapper.text()).toContain('GitHub')
+    expect(wrapper.text()).toContain('管理员')
+
+    await wrapper.find('[aria-label="打开通知"]').trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="mark-all-notifications-read"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="unread-notification-count"]').exists()).toBe(true)
+
+    await wrapper.find('[data-testid="mark-all-notifications-read"]').trigger('click')
+    expect(wrapper.find('[data-testid="unread-notification-count"]').exists()).toBe(false)
   })
 
-  it('keeps generated theme preview in a floating review bar before applying', () => {
-    const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/App.vue'),
-      'utf8',
-    )
+  it('emits theme and layout actions and exposes a menu close operation', async () => {
+    let themeEvent: MouseEvent | undefined
+    let themeEventCurrentTarget: EventTarget | null = null
+    const { wrapper } = await mountHeader({
+      onToggleThemeMode(event: MouseEvent) {
+        themeEvent = event
+        themeEventCurrentTarget = event.currentTarget
+      },
+    })
 
-    expect(source).toContain('const themePreviewBarOpen = ref(false)')
-    expect(source).toContain('const previewThemePayload = ref(null)')
-    expect(source).toContain('const currentThemeSnapshot = ref(null)')
-    expect(source).toContain('function previewGeneratedTheme(payload)')
-    expect(source).toContain('themeGeneratorOpen.value = false')
-    expect(source).toContain('themePreviewBarOpen.value = true')
-    expect(source).toContain('function cancelGeneratedThemePreview()')
-    expect(source).toContain('themeGeneratorOpen.value = true')
-    expect(source).toContain('function openThemeGenerator()')
-    expect(source).toContain('cancelGeneratedThemePreview()')
-    expect(source).toContain('@open-theme-generator="openThemeGenerator"')
-    expect(source).toContain('function applyPreviewedTheme()')
-    expect(source).toContain('admin-preview__theme-preview-bar')
-    expect(source).toContain('admin-preview__theme-preview-bar--md3')
-    expect(source).toContain('admin-preview__theme-preview-bar--md2')
-    expect(source).toContain('z-index: 2400')
-    expect(source).toContain('padding: 5px 10px 5px 6px;')
-    expect(source).toContain('当前主题')
-    expect(source).toContain('预览主题')
-    expect(source).toContain('取消预览')
-  })
+    const themeButton = wrapper.find('[data-testid="header-theme-toggle"]')
+    await themeButton.trigger('click')
+    await wrapper.find('[data-testid="header-layout-toggle"]').trigger('click')
 
-  it('persists custom theme colors with the example settings', () => {
-    const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/App.vue'),
-      'utf8',
-    )
+    expect(wrapper.emitted('toggleThemeMode')).toHaveLength(1)
+    expect(themeEvent).toBeInstanceOf(MouseEvent)
+    expect(themeEventCurrentTarget).toBe(themeButton.element)
+    expect(wrapper.emitted('update:layoutMode')).toEqual([['top']])
 
-    expect(source).toContain('customColors: defaultCustomColors()')
-    expect(source).toContain('const customColors = ref(persistedSettings.customColors)')
-    expect(source).toContain('customColors: customColors.value')
-    expect(source).toContain('function normalizeCustomColors')
-    expect(source).toContain('updateCustomColors(value)')
-    expect(source).toContain('commitAdminSettings()')
+    await wrapper.find('[aria-label="打开通知"]').trigger('click')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('.var-menu-stub__content').exists()).toBe(true)
+    wrapper.vm.closeMenus()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('.var-menu-stub__content').exists()).toBe(false)
   })
 })

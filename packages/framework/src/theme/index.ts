@@ -45,3 +45,18 @@ export {
   type AdminScrollbarMode,
   type AdminThemeTokens,
 } from './tokens'
+export {
+  useAdminTheme,
+  type AdminGeneratedThemePayload,
+  type AdminThemeApply,
+  type AdminThemeColorInput,
+  type AdminThemeController,
+  type AdminThemeStateInput,
+  type UseAdminThemeOptions,
+} from './use-admin-theme'
+export {
+  useThemePreview,
+  type AdminThemePreviewController,
+  type AdminThemePreviewPayload,
+  type UseThemePreviewOptions,
+} from './use-theme-preview'

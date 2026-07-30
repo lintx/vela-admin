@@ -4,6 +4,12 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AdminLayout } from '../../src/index'
+import {
+  createAdminThemeModeTransition,
+  resolveAdminThemeTransitionClipPath,
+  type AdminThemeTransitionDocument,
+  type AdminThemeTransitionWindow,
+} from '../../src/theme'
 import { globalStubs, layoutProps, mockViewport, resetLayoutTestDom } from './admin-layout-test-utils'
 
 afterEach(resetLayoutTestDom)
@@ -26,7 +32,7 @@ describe('AdminLayout settings drawer', () => {
     expect(wrapper.find('.va-admin-settings-drawer--open').text()).toContain('布局模式')
     expect(wrapper.find('.va-admin-settings-drawer--open').text()).toContain('个性设置')
 
-    await wrapper.find('[data-testid="admin-layout-mode-segments"]').trigger('click')
+    await wrapper.find('[data-testid="admin-layout-mode-segments"] [data-option-value="top"]').trigger('click')
     expect(wrapper.emitted('update:mode')?.at(-1)).toEqual(['top'])
   })
 
@@ -106,23 +112,15 @@ describe('AdminLayout settings drawer', () => {
     expect(wrapper.find('.va-admin-settings-drawer--open').text()).not.toContain('父级背景')
     expect(wrapper.find('.va-admin-settings-drawer--open').text()).not.toContain('菜单搜索')
 
-    await wrapper.find('[data-testid="admin-layout-mode-segments"]').trigger('click')
+    await wrapper.find('[data-testid="admin-layout-mode-segments"] [data-option-value="top"]').trigger('click')
     expect(wrapper.emitted('update:mode')?.at(-1)).toEqual(['top'])
 
     await wrapper.find('[aria-label="选择自定义青绿"]').trigger('click')
     expect(wrapper.emitted('update:sourceColor')?.at(-1)).toEqual(['#10B981'])
   })
 
-  it('updates theme mode from settings drawer through the shared theme transition', async () => {
+  it('emits the clicked theme mode option as the transition target', async () => {
     mockViewport(false)
-    const transition = { ready: Promise.resolve() }
-    const animate = vi.fn()
-    const startViewTransition = vi.fn((callback: () => void) => {
-      callback()
-      return transition
-    })
-    ;(document as Document & { startViewTransition?: typeof startViewTransition }).startViewTransition = startViewTransition
-    document.documentElement.animate = animate
 
     const wrapper = mount(AdminLayout, {
       props: layoutProps({
@@ -133,13 +131,314 @@ describe('AdminLayout settings drawer', () => {
     })
 
     await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
-    await wrapper.find('[data-testid="admin-theme-mode-segments"]').trigger('click')
-    await transition.ready
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    await darkOption.trigger('click')
 
-    expect(startViewTransition).toHaveBeenCalledTimes(1)
-    expect(wrapper.emitted('update:themeMode')?.at(-1)).toEqual(['light'])
-    expect(wrapper.emitted('update:themeBase')?.at(-1)).toEqual(['md3Light'])
-    expect(animate).toHaveBeenCalled()
+    expect(wrapper.emitted('update:themeMode')?.at(-1)).toEqual(['dark', darkOption.element])
+    expect(wrapper.emitted('update:themeBase')?.at(-1)).toEqual(['md3Dark'])
+  })
+
+  it('emits theme base before starting an async theme mode transition', async () => {
+    mockViewport(false)
+    const events: string[] = []
+    let updatePromise = Promise.resolve()
+    const documentRef = {
+      documentElement: { animate: vi.fn() },
+      startViewTransition: vi.fn((callback: () => void) => {
+        events.push('transition:start')
+        updatePromise = Promise.resolve().then(() => {
+          events.push('transition:callback')
+          callback()
+        })
+        return { ready: updatePromise }
+      }),
+    } as unknown as AdminThemeTransitionDocument
+    const modeTransition = createAdminThemeModeTransition({
+      getMode: () => 'system' as const,
+      setMode: mode => events.push(`mode:${mode}`),
+      modes: ['light', 'dark'] as const,
+      windowRef: {
+        innerWidth: 800,
+        innerHeight: 600,
+        matchMedia: () => ({ matches: false }) as MediaQueryList,
+      },
+      documentRef,
+    })
+    const wrapper = mount(AdminLayout, {
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+        'onUpdate:themeBase': (base: string) => events.push(`base:${base}`),
+        'onUpdate:themeMode': (mode: 'light' | 'dark', target: HTMLElement | null) => {
+          events.push(`mode-event:${mode}`)
+          modeTransition.to(mode, target)
+        },
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    const clickPromise = darkOption.trigger('click')
+
+    expect(events).toEqual([
+      'base:md3Dark',
+      'mode-event:dark',
+      'transition:start',
+    ])
+
+    await clickPromise
+    await updatePromise
+    expect(events).toEqual([
+      'base:md3Dark',
+      'mode-event:dark',
+      'transition:start',
+      'transition:callback',
+      'mode:dark',
+    ])
+  })
+
+  it('emits the focused theme mode option as the keyboard transition target', async () => {
+    mockViewport(false)
+
+    const wrapper = mount(AdminLayout, {
+      attachTo: document.body,
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    const darkOptionElement = darkOption.element as HTMLElement
+    darkOptionElement.focus()
+    await wrapper.vm.$nextTick()
+    expect(document.activeElement).toBe(darkOptionElement)
+
+    await darkOption.trigger('keydown', { key: 'Enter' })
+
+    expect(wrapper.emitted('update:themeMode')?.at(-1)).toEqual(['dark', darkOptionElement])
+  })
+
+  it('keeps the Space keyup theme mode target after the keydown microtask', async () => {
+    mockViewport(false)
+
+    const wrapper = mount(AdminLayout, {
+      attachTo: document.body,
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    const darkOptionElement = darkOption.element as HTMLElement
+    vi.spyOn(darkOptionElement, 'getBoundingClientRect').mockReturnValue({
+      x: 100,
+      y: 40,
+      left: 100,
+      top: 40,
+      right: 180,
+      bottom: 72,
+      width: 80,
+      height: 32,
+      toJSON: () => ({}),
+    })
+    darkOptionElement.focus()
+    await wrapper.vm.$nextTick()
+
+    await darkOption.trigger('keydown', { key: ' ' })
+    await Promise.resolve()
+    expect(wrapper.emitted('update:themeMode')).toBeUndefined()
+
+    await darkOption.trigger('keyup', { key: ' ' })
+
+    const emittedTarget = wrapper.emitted('update:themeMode')?.at(-1)?.[1]
+    expect(wrapper.emitted('update:themeMode')?.at(-1)).toEqual(['dark', darkOptionElement])
+    expect(resolveAdminThemeTransitionClipPath({
+      rect: (emittedTarget as HTMLElement).getBoundingClientRect(),
+      viewportWidth: 800,
+      viewportHeight: 600,
+      pixelRatio: 2,
+    }).from).toBe('circle(0px at 140px 56px)')
+  })
+
+  it('does not reuse a focused option for a later programmatic theme mode update', async () => {
+    mockViewport(false)
+
+    const wrapper = mount(AdminLayout, {
+      attachTo: document.body,
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    ;(darkOption.element as HTMLElement).focus()
+    await wrapper.vm.$nextTick()
+
+    const themeModeSegments = wrapper.findAllComponents({ name: 'VarSegmentedButtons' })
+      .find(component => component.attributes('data-testid') === 'admin-theme-mode-segments')
+    expect(themeModeSegments).toBeDefined()
+
+    themeModeSegments!.vm.$emit('update:modelValue', 'light')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.emitted('update:themeMode')?.at(-1)?.[0]).toBe('light')
+    expect([null, undefined]).toContain(wrapper.emitted('update:themeMode')?.at(-1)?.[1])
+  })
+
+  it('clears an unconsumed pointer target after the current interaction microtask', async () => {
+    mockViewport(false)
+
+    const wrapper = mount(AdminLayout, {
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    await darkOption.trigger('pointerdown')
+    await Promise.resolve()
+
+    const themeModeSegments = wrapper.findAllComponents({ name: 'VarSegmentedButtons' })
+      .find(component => component.attributes('data-testid') === 'admin-theme-mode-segments')
+    expect(themeModeSegments).toBeDefined()
+
+    themeModeSegments!.vm.$emit('update:modelValue', 'light')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.emitted('update:themeMode')?.at(-1)?.[0]).toBe('light')
+    expect([null, undefined]).toContain(wrapper.emitted('update:themeMode')?.at(-1)?.[1])
+  })
+
+  it('does not use the segmented control blank area as a theme transition target', async () => {
+    mockViewport(false)
+
+    const wrapper = mount(AdminLayout, {
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const themeModeSegments = wrapper.findAllComponents({ name: 'VarSegmentedButtons' })
+      .find(component => component.attributes('data-testid') === 'admin-theme-mode-segments')
+    expect(themeModeSegments).toBeDefined()
+
+    const radioGroup = wrapper.find('[data-testid="admin-theme-mode-segments"] [role="radiogroup"]')
+    radioGroup.element.addEventListener('click', () => {
+      themeModeSegments!.vm.$emit('update:modelValue', 'light')
+    }, { once: true })
+    await radioGroup.trigger('click')
+
+    expect(wrapper.emitted('update:themeMode')?.at(-1)?.[0]).toBe('light')
+    expect([null, undefined]).toContain(wrapper.emitted('update:themeMode')?.at(-1)?.[1])
+  })
+
+  it('does not reuse a stale theme transition target for programmatic updates', async () => {
+    mockViewport(false)
+
+    const wrapper = mount(AdminLayout, {
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    await darkOption.trigger('click')
+    expect(wrapper.emitted('update:themeMode')?.at(-1)).toEqual(['dark', darkOption.element])
+
+    const themeModeSegments = wrapper.findAllComponents({ name: 'VarSegmentedButtons' })
+      .find(component => component.attributes('data-testid') === 'admin-theme-mode-segments')
+    expect(themeModeSegments).toBeDefined()
+
+    themeModeSegments!.vm.$emit('update:modelValue', 'light')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.emitted('update:themeMode')?.at(-1)?.[0]).toBe('light')
+    expect([null, undefined]).toContain(wrapper.emitted('update:themeMode')?.at(-1)?.[1])
+  })
+
+  it('animates the theme mode transition from the emitted option center in CSS pixel coordinates', async () => {
+    mockViewport(false)
+    const transition = { ready: Promise.resolve() }
+    const animate = vi.fn()
+    const documentRef = {
+      documentElement: { animate },
+      startViewTransition: vi.fn((callback: () => void) => {
+        callback()
+        return transition
+      }),
+    } as unknown as AdminThemeTransitionDocument
+    const windowRef: AdminThemeTransitionWindow = {
+      innerWidth: 800,
+      innerHeight: 600,
+      devicePixelRatio: 2,
+      matchMedia: () => ({ matches: false }) as MediaQueryList,
+    }
+    const wrapper = mount(AdminLayout, {
+      props: layoutProps({
+        themeMode: 'system',
+        themeBase: 'md3Light',
+      }),
+      global: globalStubs(),
+    })
+
+    await wrapper.find('[data-testid="admin-settings-button"]').trigger('click')
+    const darkOption = wrapper.find('[data-testid="admin-theme-mode-segments"] [data-option-value="dark"]')
+    vi.spyOn(darkOption.element, 'getBoundingClientRect').mockReturnValue({
+      x: 100,
+      y: 40,
+      left: 100,
+      top: 40,
+      right: 180,
+      bottom: 72,
+      width: 80,
+      height: 32,
+      toJSON: () => ({}),
+    })
+    await darkOption.trigger('click')
+
+    const emittedTarget = wrapper.emitted('update:themeMode')?.at(-1)?.[1]
+    const modeTransition = createAdminThemeModeTransition({
+      getMode: () => 'system' as const,
+      setMode: vi.fn(),
+      modes: ['light', 'dark'] as const,
+      windowRef,
+      documentRef,
+    })
+    modeTransition.to('dark', emittedTarget as HTMLElement)
+    await transition.ready
+    await Promise.resolve()
+
+    const x = 140
+    const y = 56
+    const radius = Math.hypot(660, 544)
+    expect(animate).toHaveBeenCalledWith(
+      {
+        clipPath: [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${radius}px at ${x}px ${y}px)`,
+        ],
+      },
+      expect.any(Object),
+    )
   })
 
   it('keeps settings drawer as a square native drawer surface', () => {

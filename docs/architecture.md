@@ -11,9 +11,11 @@
   Vue 入口
   Vela Admin 配置
   页面模块和 meta
-  权限服务
-  菜单服务
-  主题系统
+  Vela Admin 应用控制器
+    Settings Controller
+    Tabs Controller
+    Theme Controller
+  业务鉴权和头部工具
   业务自己的请求、状态和页面逻辑
 ```
 
@@ -26,8 +28,9 @@ Vela Admin 负责后台壳层和基础约定，业务应用仍然保留自己的
 1. 业务工程通过 `import.meta.glob()` 收集页面组件和同名 meta 文件，页面默认懒加载，meta 默认 eager。
 2. `createAdminRouter()` 根据页面模块生成 Vue Router 路由。
 3. `defineAdminConfig()` 描述应用名、布局、主题、设置和权限配置。
-4. `createAdminApp()` 创建应用实例，安装路由、配置、权限和主题能力。
-5. 业务应用按自己的方式接入请求、状态管理、接口类型和业务组件。
+4. `createAdminApp()` 创建应用实例并注入响应式设置服务。
+5. 根组件按需组合 Settings、Tabs 和 Theme 控制器，连接 `AdminLayout` 与路由出口。
+6. 业务应用按自己的方式接入鉴权、请求、状态管理、头部工具和业务组件。
 
 ```js
 const lazyPages = import.meta.glob([
@@ -75,6 +78,27 @@ import { createPermissionService } from 'vela-admin/permission'
 ```
 
 根入口 `vela-admin` 仍保留完整导出，适合小项目或迁移期使用；希望更清晰的加载边界时，优先使用子入口。
+
+## 应用控制器边界
+
+framework 提供三个可独立组合的应用级控制器：
+
+- Settings：本地设置、版本迁移、可选远端加载、防抖保存、同步状态和重试。
+- Tabs：路由标签、关闭导航、固定标签、排序、缓存刷新和滚动恢复。
+- Theme：主题状态、动态主题应用、模式切换动画和生成器预览事务。
+
+```js
+import { useAdminSettings } from 'vela-admin/app'
+import { useAdminTabs } from 'vela-admin/tabs'
+import { useAdminTheme, useThemePreview } from 'vela-admin/theme'
+
+const settings = useAdminSettings()
+const tabs = useAdminTabs({ router, route, settings, permission })
+const theme = useAdminTheme({ settings })
+const preview = useThemePreview({ theme })
+```
+
+这些控制器负责可复用编排，但不接管完整应用壳。`AdminLayout` 继续是受控布局组件；品牌 Logo、业务头部、通知、用户菜单、登录和会话恢复仍由业务层负责。远端设置同步同样由业务提供 HTTP 适配器，详见 [配置参考](configuration.md#本地持久化与服务端同步)。
 
 ## 权限边界
 

@@ -37,10 +37,15 @@ export const defaultAdminConfig: AdminConfig = {
     persist: true,
     developerTools: false,
     sourceColor: '#6750A4',
+    customColors: [],
+  },
+  tabs: {
+    fixedTabs: [],
   },
   settings: {
     persist: true,
     storageKey: 'varlet-admin:settings',
+    schemaVersion: 1,
   },
   permission: {
     unauthorizedBehavior: 'remove',

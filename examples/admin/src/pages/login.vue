@@ -70,7 +70,7 @@ function resolveRedirectPath() {
         <p>登录后可进入控制台，并通过不同权限验证菜单与按钮状态。</p>
       </div>
 
-      <var-form class="admin-login__form" @submit.prevent="submit">
+      <var-form class="admin-login__form" @submit="submit">
         <label class="admin-login__field">
           <span>账号</span>
           <var-input v-model="form.username" autocomplete="username" placeholder="请输入账号" />
@@ -90,7 +90,7 @@ function resolveRedirectPath() {
           {{ errorMessage }}
         </p>
 
-        <var-button class="admin-login__submit" block type="primary" native-type="submit" :loading="loading" @click="submit">
+        <var-button class="admin-login__submit" block type="primary" native-type="submit" :loading="loading">
           登录
         </var-button>
       </var-form>

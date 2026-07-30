@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AdminLayoutMode, AdminScrollbarMode, AdminThemeBase, AdminThemeMode, ThemeColorChip } from '../../index'
 import VaIcon from '../../icons/VaIcon.vue'
+import type { AdminThemeTransitionTarget } from '../../theme/theme-transition'
 import AdminSettingsDrawerContent from './AdminSettingsDrawerContent.vue'
 
 withDefaults(defineProps<{
@@ -44,10 +45,14 @@ const emit = defineEmits<{
   'update:tagsView': [value: boolean]
   'update:menuSearch': [value: boolean]
   'update:themeBase': [value: AdminThemeBase]
-  'update:themeMode': [value: AdminThemeMode]
+  'update:themeMode': [mode: AdminThemeMode, target?: AdminThemeTransitionTarget | null]
   'update:sourceColor': [value: string]
   openThemeGenerator: []
 }>()
+
+function emitThemeMode(mode: AdminThemeMode, target?: AdminThemeTransitionTarget | null) {
+  emit('update:themeMode', mode, target)
+}
 </script>
 
 <template>
@@ -83,7 +88,7 @@ const emit = defineEmits<{
         @update:scrollbar="emit('update:scrollbar', $event)"
         @update:tags-view="emit('update:tagsView', $event)"
         @update:theme-base="emit('update:themeBase', $event)"
-        @update:theme-mode="emit('update:themeMode', $event)"
+        @update:theme-mode="emitThemeMode"
         @update:source-color="emit('update:sourceColor', $event)"
         @open-theme-generator="emit('openThemeGenerator')"
       />

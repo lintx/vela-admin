@@ -72,18 +72,12 @@ export function resolveAdminThemeTransitionClipPath({
   rect,
   viewportWidth,
   viewportHeight,
-  pixelRatio = 1,
 }: ResolveAdminThemeTransitionClipPathOptions): ResolvedAdminThemeTransitionClipPath {
-  const scale = normalizePixelRatio(pixelRatio)
-  const rawX = rect ? rect.left + rect.width / 2 : viewportWidth / 2
-  const rawY = rect ? rect.top + rect.height / 2 : viewportHeight / 2
-  const x = rawX * scale
-  const y = rawY * scale
-  const width = viewportWidth * scale
-  const height = viewportHeight * scale
+  const x = rect ? rect.left + rect.width / 2 : viewportWidth / 2
+  const y = rect ? rect.top + rect.height / 2 : viewportHeight / 2
   const endRadius = Math.hypot(
-    Math.max(x, width - x),
-    Math.max(y, height - y),
+    Math.max(x, viewportWidth - x),
+    Math.max(y, viewportHeight - y),
   )
 
   return {
@@ -183,8 +177,4 @@ function resolveThemeTransitionTarget(event?: Event | AdminThemeTransitionTarget
   return target && 'getBoundingClientRect' in target
     ? target as AdminThemeTransitionTarget
     : null
-}
-
-function normalizePixelRatio(value: number): number {
-  return Number.isFinite(value) && value > 0 ? value : 1
 }

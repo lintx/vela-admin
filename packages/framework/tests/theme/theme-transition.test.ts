@@ -9,7 +9,7 @@ import {
 } from '../../src/theme'
 
 describe('resolveAdminThemeTransitionClipPath', () => {
-  it('maps button center and end radius into the device pixel ratio coordinate space', () => {
+  it('keeps button center and end radius in the CSS pixel coordinate space', () => {
     const result = resolveAdminThemeTransitionClipPath({
       rect: {
         left: 600,
@@ -22,9 +22,9 @@ describe('resolveAdminThemeTransitionClipPath', () => {
       pixelRatio: 2,
     })
 
-    const x = 1320
-    const y = 80
-    const radius = Math.hypot(Math.max(x, 1920 - x), Math.max(y, 1080 - y))
+    const x = 660
+    const y = 40
+    const radius = Math.hypot(Math.max(x, 960 - x), Math.max(y, 540 - y))
 
     expect(result).toEqual({
       from: `circle(0px at ${x}px ${y}px)`,
@@ -73,7 +73,7 @@ describe('resolveAdminThemeTransitionClipPath', () => {
     expect(documentRef.startViewTransition).not.toHaveBeenCalled()
   })
 
-  it('starts a view transition and animates from the scaled target center', async () => {
+  it('starts a view transition and animates from the CSS pixel target center', async () => {
     const update = vi.fn()
     const animate = vi.fn()
     const transition = { ready: Promise.resolve() }
@@ -107,9 +107,9 @@ describe('resolveAdminThemeTransitionClipPath', () => {
     await transition.ready
     await Promise.resolve()
 
-    const x = 1320
-    const y = 80
-    const radius = Math.hypot(Math.max(x, 1920 - x), Math.max(y, 1080 - y))
+    const x = 660
+    const y = 40
+    const radius = Math.hypot(Math.max(x, 960 - x), Math.max(y, 540 - y))
 
     expect(update).toHaveBeenCalledTimes(1)
     expect(animate).toHaveBeenCalledWith(

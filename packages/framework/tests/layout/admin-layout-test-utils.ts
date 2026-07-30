@@ -123,9 +123,30 @@ export function globalStubs(overrides: Record<string, unknown> = {}) {
         template: '<div v-if="show" v-bind="$attrs" :data-default-style="defaultStyle === false ? \'false\' : \'true\'"><slot /></div>',
       },
       VarSegmentedButtons: {
+        name: 'VarSegmentedButtons',
+        inheritAttrs: false,
         props: ['modelValue', 'options', 'checkmark'],
         emits: ['update:modelValue'],
-        template: '<button v-bind="$attrs" type="button" :data-checkmark="checkmark === false ? \'false\' : \'true\'" @click="$emit(\'update:modelValue\', options?.[1]?.value ?? modelValue)"><slot />{{ options?.map((option) => option.label).join(\'\') }}</button>',
+        template: `
+          <div v-bind="$attrs" :data-checkmark="checkmark === false ? 'false' : 'true'">
+            <div role="radiogroup">
+              <button
+                v-for="option in options"
+                :key="option.value"
+                type="button"
+                role="radio"
+                :aria-checked="modelValue === option.value ? 'true' : 'false'"
+                :data-option-value="option.value"
+                @click="$emit('update:modelValue', option.value)"
+                @keydown.enter="$emit('update:modelValue', option.value)"
+                @keyup.space="$emit('update:modelValue', option.value)"
+              >
+                {{ option.label }}
+              </button>
+            </div>
+            <slot />
+          </div>
+        `,
       },
       VarBreadcrumbs: {
         template: '<nav data-testid="admin-header-breadcrumb"><slot /></nav>',
@@ -239,4 +260,3 @@ export function createMenuSelectStub() {
     },
   }
 }
-
