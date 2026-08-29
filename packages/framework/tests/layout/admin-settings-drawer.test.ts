@@ -20,6 +20,14 @@ afterEach(() => {
 })
 
 describe('AdminLayout settings drawer', () => {
+  it('does not pass unhandled collapsed sidebar options into the settings drawer', () => {
+    const settingsDrawerSource = readFileSync(resolve(__dirname, '../../src/layout/components/AdminSettingsDrawer.vue'), 'utf8')
+
+    expect(settingsDrawerSource).not.toContain('sidebarCollapsedWidth')
+    expect(settingsDrawerSource).not.toContain('sidebarCollapsedIconSize')
+    expect(settingsDrawerSource).not.toContain('expandedParentBackground')
+  })
+
   it('opens settings drawer and emits setting changes', async () => {
     mockViewport(false)
 

@@ -140,6 +140,7 @@ Vela Admin 不强制规定以下业务选择：
 - [架构说明](docs/architecture.md)
 - [设计系统](docs/varlet-admin-design-system.md)
 - [页面模式与视觉验收](docs/varlet-admin-page-patterns.md)
+- [弃用 API](docs/deprecations.md)
 - [路线图](docs/roadmap.md)
 
 ## 维护者入口

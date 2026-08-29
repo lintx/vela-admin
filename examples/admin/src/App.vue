@@ -51,7 +51,6 @@ function closeHeaderToolMenus() {
 
   <AdminLayout
     v-else
-    app-name="Vela Admin"
     :menus="menus"
     :active-paths="activePaths"
     :current-path="route.path"

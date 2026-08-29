@@ -35,6 +35,8 @@ pnpm run release:verify
 
 如果只准备验证某个包，也应运行对应 `pack:*` 命令确认发布内容。
 
+`release:verify` 通过根级测试执行 `pnpm run test:deprecations`，保证注册表、源码注释和用户弃用文档一致。准备 major 或公开 API 清理时，还应运行 `pnpm run deprecations:audit`，人工确认达到最早版本的条目是否同时满足迁移窗口和移除条件。
+
 ## 自动发布
 
 仓库使用 `.github/workflows/publish-npm.yml` 发布 npm 包。工作流触发方式：

@@ -108,7 +108,7 @@ function canDropRule(context) {
 </script>
 
 <template>
-  <section class="admin-sortable admin-page-span">
+  <section class="admin-sortable">
     <header class="admin-sortable__header">
       <div>
         <p class="admin-sortable__eyebrow">Sortable</p>
@@ -387,10 +387,6 @@ function canDropRule(context) {
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-sortable,
 .admin-sortable__panel,
 .admin-sortable__stack {

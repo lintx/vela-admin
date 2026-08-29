@@ -1,0 +1,4 @@
+interface:
+  display_name: "Using Varlet"
+  short_description: "基于当前版本查询 Varlet 官方文档、源码并指导组件选型"
+  default_prompt: "Use $using-varlet to select or verify Varlet components for this Vela Admin task."

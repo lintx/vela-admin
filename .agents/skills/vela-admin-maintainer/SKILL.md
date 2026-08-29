@@ -25,6 +25,7 @@ If any marker is missing, stop unless the user explicitly asks to adapt this ski
 - `.ai-dev` checkpoint commits stay in `.ai-dev/.git`; never merge/cherry-pick/fetch them into main.
 - Do not amend, rebase, squash, reset, or otherwise rewrite `.ai-dev` checkpoint history. Each meaningful change gets a new checkpoint so rollback/audit remains possible.
 - Do not create extra sandbox branches by default. Use `.ai-dev` local `main` unless the user asks to park separate work.
+- Before each sandbox checkpoint or explicitly authorized main-repo commit, run `pnpm run deprecations:audit` exactly once for that batch. Report candidates for human judgment; never remove APIs automatically or add hooks/background checks.
 
 ## Context Discipline
 

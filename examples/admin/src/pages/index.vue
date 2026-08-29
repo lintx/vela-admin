@@ -62,7 +62,7 @@ const activities = [
 </script>
 
 <template>
-  <section class="admin-dashboard admin-page-span">
+  <section class="admin-dashboard">
     <header class="admin-dashboard__hero">
       <div class="admin-dashboard__hero-main">
         <p class="admin-dashboard__eyebrow">控制台</p>
@@ -75,79 +75,81 @@ const activities = [
       </var-space>
     </header>
 
-    <div class="admin-dashboard__stats">
-      <div v-for="item in stats" :key="item.label" class="admin-dashboard__stat">
-        <VaIcon :name="item.icon" />
-        <span>{{ item.label }}</span>
-        <strong>{{ item.value }}</strong>
-      </div>
-    </div>
+    <var-row align="stretch" :gutter="[12, 12]">
+      <var-col v-for="item in stats" :key="item.label" :span="24" :md="6" :lg="6" :xl="6">
+        <div class="admin-dashboard__stat">
+          <VaIcon :name="item.icon" />
+          <span>{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+        </div>
+      </var-col>
+    </var-row>
 
-    <section class="admin-dashboard__panel">
-      <h3>当前登录状态</h3>
-      <var-cell title="用户" :description="session.user?.name || '未登录'" />
-      <var-cell title="角色" :description="session.roles.join('、') || '无'" />
-      <var-cell title="权限" :description="session.permissions.slice(0, 5).join('、')" />
-      <var-progress class="admin-dashboard__progress" :value="permissionProgress" label />
-    </section>
+    <var-row align="stretch" :gutter="[16, 16]">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-dashboard__panel">
+          <h3>当前登录状态</h3>
+          <var-cell title="用户" :description="session.user?.name || '未登录'" />
+          <var-cell title="角色" :description="session.roles.join('、') || '无'" />
+          <var-cell title="权限" :description="session.permissions.slice(0, 5).join('、')" />
+          <var-progress class="admin-dashboard__progress" :value="permissionProgress" label />
+        </section>
+      </var-col>
 
-    <section class="admin-dashboard__panel">
-      <h3>主题与布局</h3>
-      <var-cell title="布局模式" :description="layoutMode" />
-      <var-cell title="主题版本" :description="themeBase" />
-      <var-cell title="明暗模式" :description="themeMode" />
-      <div class="admin-dashboard__palette" aria-label="源颜色">
-        <var-button
-          v-for="item in quickColors"
-          :key="item.value"
-          class="admin-dashboard__swatch"
-          :class="{ 'admin-dashboard__swatch--active': sourceColor.toLowerCase() === item.value.toLowerCase() }"
-          text
-          @click="$emit('update:source-color', item.value)"
-        >
-          <span :style="{ backgroundColor: item.value }" />
-          {{ item.label }}
-        </var-button>
-      </div>
-    </section>
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-dashboard__panel">
+          <h3>主题与布局</h3>
+          <var-cell title="布局模式" :description="layoutMode" />
+          <var-cell title="主题版本" :description="themeBase" />
+          <var-cell title="明暗模式" :description="themeMode" />
+          <div class="admin-dashboard__palette" aria-label="源颜色">
+            <var-button
+              v-for="item in quickColors"
+              :key="item.value"
+              class="admin-dashboard__swatch"
+              :class="{ 'admin-dashboard__swatch--active': sourceColor.toLowerCase() === item.value.toLowerCase() }"
+              text
+              @click="$emit('update:source-color', item.value)"
+            >
+              <span :style="{ backgroundColor: item.value }" />
+              {{ item.label }}
+            </var-button>
+          </div>
+        </section>
+      </var-col>
 
-    <section class="admin-dashboard__panel">
-      <h3>最近操作</h3>
-      <var-cell v-for="activity in activities" :key="activity.title" :title="activity.title">
-        <template #icon>
-          <VaIcon :name="activity.icon" />
-        </template>
-      </var-cell>
-    </section>
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-dashboard__panel">
+          <h3>最近操作</h3>
+          <var-cell v-for="activity in activities" :key="activity.title" :title="activity.title">
+            <template #icon>
+              <VaIcon :name="activity.icon" />
+            </template>
+          </var-cell>
+        </section>
+      </var-col>
 
-    <section class="admin-dashboard__panel">
-      <h3>组件状态</h3>
-      <var-space direction="column" :size="[12, 12]">
-        <var-input placeholder="请输入关键词" />
-        <var-space :size="[8, 8]">
-          <var-button>默认按钮</var-button>
-          <var-button type="primary">主要操作</var-button>
-          <var-button type="danger" text>危险操作</var-button>
-        </var-space>
-      </var-space>
-    </section>
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-dashboard__panel">
+          <h3>组件状态</h3>
+          <var-space direction="column" :size="[12, 12]">
+            <var-input placeholder="请输入关键词" />
+            <var-space :size="[8, 8]">
+              <var-button>默认按钮</var-button>
+              <var-button type="primary">主要操作</var-button>
+              <var-button type="danger" text>危险操作</var-button>
+            </var-space>
+          </var-space>
+        </section>
+      </var-col>
+    </var-row>
   </section>
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-dashboard {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-}
-
-.admin-dashboard__hero,
-.admin-dashboard__stats {
-  grid-column: 1 / -1;
 }
 
 .admin-dashboard__hero {
@@ -186,14 +188,11 @@ const activities = [
   color: var(--color-on-surface-variant);
 }
 
-.admin-dashboard__stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
 .admin-dashboard__stat {
   display: grid;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   padding: 14px 0;
   gap: 6px;
   border-top: 1px solid var(--color-outline-variant);
@@ -214,6 +213,9 @@ const activities = [
 }
 
 .admin-dashboard__panel {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   min-width: 0;
   padding-top: 16px;
   border-top: 1px solid var(--color-outline-variant);
@@ -255,11 +257,6 @@ const activities = [
 }
 
 @media (max-width: 900px) {
-  .admin-dashboard,
-  .admin-dashboard__stats {
-    grid-template-columns: 1fr;
-  }
-
   .admin-dashboard__hero {
     flex-direction: column;
   }

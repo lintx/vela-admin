@@ -7,8 +7,12 @@
     "dev": "pnpm --filter vela-admin-example dev",
     "build": "pnpm --filter vela-admin build && pnpm --filter vela-admin-example build",
     "build:cloudflare-pages": "pnpm --filter vela-admin-example build:cloudflare-pages",
-    "test": "pnpm --filter vela-admin test && pnpm run test:create",
+    "test": "pnpm --filter vela-admin test && pnpm run test:create && pnpm run test:skills && pnpm run test:deprecations",
     "test:create": "node --test packages/create-vela-admin/tests/create-cli.test.js scripts/package-command.test.js",
+    "test:skills": "node --test scripts/project-skills.test.js scripts/install-codex-skill.test.js .agents/skills/using-varlet/scripts/sync-varlet-docs.test.mjs",
+    "test:deprecations": "node --test scripts/deprecations.test.js && node scripts/deprecations.js check",
+    "deprecations:generate": "node scripts/deprecations.js generate",
+    "deprecations:audit": "node scripts/deprecations.js audit",
     "create": "node packages/create-vela-admin/src/index.js",
     "create:sync-template": "pnpm --filter create-vela-admin sync-template",
     "pack:framework": "node scripts/package-command.js packages/framework pack --dry-run",
@@ -19,7 +23,9 @@
     "release:verify": "pnpm run test && pnpm run build && pnpm run pack:framework && pnpm run pack:create",
     "release:publish": "pnpm run publish:all",
     "codex:install-skill": "node scripts/install-codex-skill.js",
-    "codex:link-skill": "node scripts/install-codex-skill.js --link"
+    "codex:link-skill": "node scripts/install-codex-skill.js --link",
+    "codex:install-skills": "node scripts/install-codex-skill.js --all",
+    "codex:link-skills": "node scripts/install-codex-skill.js --all --link"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",

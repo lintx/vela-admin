@@ -47,7 +47,7 @@ const columns = [
 </script>
 
 <template>
-  <section class="admin-roles admin-page-span">
+  <section class="admin-roles">
     <header class="admin-roles__header">
       <div>
         <h2>角色管理</h2>
@@ -69,10 +69,6 @@ const columns = [
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-roles {
   display: grid;
   gap: 16px;

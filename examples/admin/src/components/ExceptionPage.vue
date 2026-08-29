@@ -24,7 +24,7 @@ defineProps({
 </script>
 
 <template>
-  <section class="admin-exception admin-page-span">
+  <section class="admin-exception">
     <div class="admin-exception__surface">
       <div class="admin-exception__visual">
         <img :src="image" :alt="`${code} ${title}`" />
@@ -58,10 +58,6 @@ defineProps({
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-exception {
   min-width: 0;
 }

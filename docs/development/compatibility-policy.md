@@ -32,6 +32,18 @@
 
 除非存在安全风险或严重错误，不应在没有迁移路径的情况下直接删除公开能力。
 
+## 弃用注册表
+
+公开 API 的弃用生命周期统一登记在根级 `deprecations.json`：
+
+1. 每项使用稳定 ID，例如 `VA-DEP-001`。
+2. 源码 `@deprecated` 注释必须包含 `[ID]`，并与注册表的 `source` 双向一致。
+3. 注册表必须记录包名、API 类型、符号、弃用版本、替代方案、迁移方式、最早移除版本、移除条件和状态。
+4. `active` 表示兼容保留；实际删除后改为 `removed` 并记录 `removedIn`，历史记录不得删除。
+5. 用户文档 `docs/deprecations.md` 由 `pnpm run deprecations:generate` 生成，不手工维护。
+
+`pnpm run test:deprecations` 严格检查注册表、源码注释和生成文档。`pnpm run deprecations:audit` 只报告已达到最早移除版本的 active 项，不自动删除，也不以“到期”阻断普通开发；维护者仍需人工确认迁移窗口和具体移除条件。
+
 ## Breaking Change
 
 以下情况应视为 breaking change：

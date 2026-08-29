@@ -76,6 +76,8 @@ AI 助手应把同一对话中的上下文、已验证结果和用户确认过�
 
 ## 结束任务前
 
+AI 准备执行 `.ai-dev` checkpoint 或用户明确授权的主目录 commit 前，每个批次只运行一次 `pnpm run deprecations:audit`。该命令只提示可能到期的 active 弃用项；不得据此自动删除 API，也不增加 Git hook、任务启动检查或后台轮询。
+
 最终回复应包含：
 
 1. 实际修改的文件。

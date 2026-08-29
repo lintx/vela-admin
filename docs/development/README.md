@@ -30,6 +30,11 @@
 
 ## 后续治理
 
-当前仓库已提供项目级 `vela-admin-maintainer` skill，位置为 `.agents/skills/vela-admin-maintainer/`。skill 只固化 AI 执行入口、上下文读取顺序和沙箱约束，不替代本目录中的稳定维护规范。
+当前仓库提供以下项目级 skill：
+
+- `.agents/skills/vela-admin-maintainer/`：固化 AI 执行入口、上下文读取顺序和沙箱约束。
+- `.agents/skills/using-varlet/`：按项目实际 Varlet 版本查询官方文档与源码，并指导组件选型、页面精简和 framework 边界判断。
+
+skill 不替代本目录中的稳定维护规范。使用 `pnpm run codex:link-skill -- <skill-name>` 链接单个 skill，或使用 `pnpm run codex:link-skills` 链接全部项目 skill。
 
 修改 `AGENTS.md` 或 `docs/development/` 中会影响 AI 执行、沙箱、提交、验收或上下文读取的规则时，应同步更新项目 skill。长期计划放在 [docs/plans](../plans/README.md)，影响长期维护的决策记录放在 [docs/adr](../adr/README.md)。

@@ -29,7 +29,7 @@ const leafStep = steps.find((item) => !item.directory)
 </script>
 
 <template>
-  <section class="admin-menu-showcase admin-page-span">
+  <section class="admin-menu-showcase">
     <div class="admin-menu-showcase__surface">
       <div class="admin-menu-showcase__header">
         <p>多级菜单</p>
@@ -75,10 +75,6 @@ const leafStep = steps.find((item) => !item.directory)
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-menu-showcase__surface {
   min-width: 0;
 }

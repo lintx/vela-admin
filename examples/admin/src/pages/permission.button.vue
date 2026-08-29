@@ -10,7 +10,7 @@ const visiblePermissionLabels = computed(() => session.value.permissions.slice(0
 </script>
 
 <template>
-  <section class="admin-permission admin-page-span">
+  <section class="admin-permission">
     <header class="admin-permission__header">
       <div>
         <p class="admin-permission__eyebrow">按钮权限</p>
@@ -102,10 +102,6 @@ const visiblePermissionLabels = computed(() => session.value.permissions.slice(0
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-permission {
   display: grid;
   gap: 16px;

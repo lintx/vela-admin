@@ -47,6 +47,7 @@
 3. 改 create 包或模板同步逻辑后运行 `pnpm run test:create`，必要时运行 `pnpm run pack:create`。
 4. 涉及公开 API、兼容性、发布、依赖或安全边界时，必须查阅对应 development 规范，并在计划中说明影响。
 5. 只改文档时至少检查 Markdown 链接和 git diff 范围。
+6. AI 准备执行 `.ai-dev` checkpoint 或用户明确授权的主目录 commit 前，每个批次只运行一次 `pnpm run deprecations:audit`；结果只用于提醒人工判断，不自动删除 API。
 
 ## 详细规范
 

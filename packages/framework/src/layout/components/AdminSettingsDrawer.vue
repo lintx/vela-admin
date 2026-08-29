@@ -8,9 +8,6 @@ withDefaults(defineProps<{
   open?: boolean
   mode?: AdminLayoutMode
   sidebarWidth?: number
-  sidebarCollapsedWidth?: number
-  sidebarCollapsedIconSize?: number
-  expandedParentBackground?: boolean
   scrollbar?: AdminScrollbarMode
   tagsView?: boolean
   menuSearch?: boolean
@@ -22,9 +19,6 @@ withDefaults(defineProps<{
   open: false,
   mode: 'side',
   sidebarWidth: 272,
-  sidebarCollapsedWidth: 56,
-  sidebarCollapsedIconSize: 26,
-  expandedParentBackground: true,
   scrollbar: 'thin',
   tagsView: true,
   menuSearch: true,
@@ -38,9 +32,6 @@ const emit = defineEmits<{
   close: []
   'update:mode': [mode: AdminLayoutMode]
   'update:sidebarWidth': [value: number]
-  'update:sidebarCollapsedWidth': [value: number]
-  'update:sidebarCollapsedIconSize': [value: number]
-  'update:expandedParentBackground': [value: boolean]
   'update:scrollbar': [value: AdminScrollbarMode]
   'update:tagsView': [value: boolean]
   'update:menuSearch': [value: boolean]

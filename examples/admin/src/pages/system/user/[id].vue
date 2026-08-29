@@ -40,7 +40,7 @@ async function save() {
 </script>
 
 <template>
-  <section class="admin-user-detail admin-page-span">
+  <section class="admin-user-detail">
     <header class="admin-user-detail__header">
       <div>
         <p class="admin-user-detail__eyebrow">动态路由</p>
@@ -98,10 +98,6 @@ async function save() {
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-user-detail {
   display: grid;
   gap: 16px;

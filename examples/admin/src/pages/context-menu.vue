@@ -141,7 +141,7 @@ function updateCustomAction(value) {
 </script>
 
 <template>
-  <section class="admin-context-menu admin-page-span">
+  <section class="admin-context-menu">
     <header class="admin-context-menu__header">
       <div>
         <p class="admin-context-menu__eyebrow">Menu</p>
@@ -150,8 +150,9 @@ function updateCustomAction(value) {
       </div>
     </header>
 
-    <div class="admin-context-menu__grid">
-      <section class="admin-context-menu__panel">
+    <var-row align="stretch" :gutter="[16, 16]">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-context-menu__panel">
         <div class="admin-context-menu__panel-head">
           <VaIcon name="menu-2" />
           <div>
@@ -169,9 +170,11 @@ function updateCustomAction(value) {
           <summary>查看源码</summary>
           <pre><code>{{ dataCode }}</code></pre>
         </details>
-      </section>
+        </section>
+      </var-col>
 
-      <section class="admin-context-menu__panel">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-context-menu__panel">
         <div class="admin-context-menu__panel-head">
           <VaIcon name="code" />
           <div>
@@ -199,9 +202,11 @@ function updateCustomAction(value) {
           <summary>查看源码</summary>
           <pre><code>{{ templateCode }}</code></pre>
         </details>
-      </section>
+        </section>
+      </var-col>
 
-      <section class="admin-context-menu__panel">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-context-menu__panel">
         <div class="admin-context-menu__panel-head">
           <VaIcon name="focus-2" />
           <div>
@@ -228,9 +233,11 @@ function updateCustomAction(value) {
           <summary>查看源码</summary>
           <pre><code>{{ placementCode }}</code></pre>
         </details>
-      </section>
+        </section>
+      </var-col>
 
-      <section class="admin-context-menu__panel">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-context-menu__panel">
         <div class="admin-context-menu__panel-head">
           <VaIcon name="cursor-click" />
           <div>
@@ -248,9 +255,11 @@ function updateCustomAction(value) {
           <summary>查看源码</summary>
           <pre><code>{{ bothCode }}</code></pre>
         </details>
-      </section>
+        </section>
+      </var-col>
 
-      <section class="admin-context-menu__panel">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-context-menu__panel">
         <div class="admin-context-menu__panel-head">
           <VaIcon name="text" />
           <div>
@@ -268,9 +277,11 @@ function updateCustomAction(value) {
           <summary>查看源码</summary>
           <pre><code>{{ plainCode }}</code></pre>
         </details>
-      </section>
+        </section>
+      </var-col>
 
-      <section class="admin-context-menu__panel">
+      <var-col :span="24" :md="12" :lg="12" :xl="12">
+        <section class="admin-context-menu__panel">
         <div class="admin-context-menu__panel-head">
           <VaIcon name="settings" />
           <div>
@@ -300,16 +311,13 @@ function updateCustomAction(value) {
           <summary>查看源码</summary>
           <pre><code>{{ customCode }}</code></pre>
         </details>
-      </section>
-    </div>
+        </section>
+      </var-col>
+    </var-row>
   </section>
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-context-menu {
   display: grid;
   gap: 16px;
@@ -351,15 +359,12 @@ function updateCustomAction(value) {
   line-height: 1.65;
 }
 
-.admin-context-menu__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
 .admin-context-menu__panel {
   display: grid;
   align-content: start;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   min-width: 0;
   padding-top: 16px;
   border-top: 1px solid var(--color-outline-variant);
@@ -479,19 +484,6 @@ function updateCustomAction(value) {
 }
 
 @media (max-width: 900px) {
-  .admin-context-menu__grid,
-  .admin-context-menu__header {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-context-menu__grid {
-    display: grid;
-  }
-
-  .admin-context-menu__header {
-    display: grid;
-  }
-
   .admin-context-menu__placement {
     grid-template-columns: 1fr;
   }

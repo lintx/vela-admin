@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "deprecations": [
+    {
+      "id": "VA-DEP-001",
+      "package": "vela-admin",
+      "apiType": "option",
+      "symbol": "CreateTabsServiceOptions.homePath",
+      "source": "packages/framework/src/tabs/create-tabs-service.ts",
+      "deprecatedIn": "0.3.0",
+      "replacement": "使用 fixedTabs 显式传入首页标签。",
+      "migration": "删除 homePath，并把固定首页作为 fixedTabs 的首项传入。",
+      "removal": {
+        "earliestVersion": "1.0.0",
+        "condition": "仅在下一个 major、调用方完成迁移且至少经过一个稳定版本后移除。"
+      },
+      "status": "active"
+    }
+  ]
+}

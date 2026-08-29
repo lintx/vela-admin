@@ -93,7 +93,7 @@ function statusType(status) {
 </script>
 
 <template>
-  <section class="admin-users admin-page-span">
+  <section class="admin-users">
     <header class="admin-users__toolbar">
       <div class="admin-users__toolbar-main">
         <h2>用户管理</h2>
@@ -183,10 +183,6 @@ function statusType(status) {
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-users {
   display: grid;
   gap: 16px;

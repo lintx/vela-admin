@@ -53,7 +53,7 @@ function splitIconValue(value) {
 </script>
 
 <template>
-  <section class="admin-icons admin-page-span">
+  <section class="admin-icons">
     <header class="admin-icons__header">
       <div>
         <p class="admin-icons__eyebrow">图标</p>
@@ -67,20 +67,26 @@ function splitIconValue(value) {
       />
     </header>
 
-    <div class="admin-icons__examples">
-      <div
+    <var-row align="stretch" :gutter="[12, 12]">
+      <var-col
         v-for="example in usageExamples"
         :key="example.title"
-        class="admin-icons__example"
+        :span="24"
+        :sm="12"
+        :md="12"
+        :lg="6"
+        :xl="6"
       >
-        <VaIcon
-          :name="splitIconValue(example.icon).name"
-          :library="splitIconValue(example.icon).library"
-        />
-        <strong>{{ example.title }}</strong>
-        <code>{{ example.code }}</code>
-      </div>
-    </div>
+        <div class="admin-icons__example">
+          <VaIcon
+            :name="splitIconValue(example.icon).name"
+            :library="splitIconValue(example.icon).library"
+          />
+          <strong>{{ example.title }}</strong>
+          <code>{{ example.code }}</code>
+        </div>
+      </var-col>
+    </var-row>
 
     <section class="admin-icons__panel">
       <div class="admin-icons__panel-header">
@@ -88,33 +94,35 @@ function splitIconValue(value) {
         <span>{{ filteredIcons.length }} / {{ semanticIcons.length }}</span>
       </div>
 
-      <div class="admin-icons__grid">
-        <div
+      <var-row align="stretch" :gutter="[12, 12]">
+        <var-col
           v-for="icon in filteredIcons"
           :key="icon.name"
-          class="admin-icons__item"
+          :span="24"
+          :sm="12"
+          :md="12"
+          :lg="6"
+          :xl="6"
         >
-          <div class="admin-icons__preview">
-            <VaIcon :name="icon.name" />
+          <div class="admin-icons__item">
+            <div class="admin-icons__preview">
+              <VaIcon :name="icon.name" />
+            </div>
+            <div class="admin-icons__body">
+              <strong>{{ icon.name }}</strong>
+              <span>{{ icon.label }}</span>
+              <p>{{ icon.usage }}</p>
+              <code>phosphor:{{ icon.phosphor }}</code>
+              <code>tabler:{{ icon.tabler }}</code>
+            </div>
           </div>
-          <div class="admin-icons__body">
-            <strong>{{ icon.name }}</strong>
-            <span>{{ icon.label }}</span>
-            <p>{{ icon.usage }}</p>
-            <code>phosphor:{{ icon.phosphor }}</code>
-            <code>tabler:{{ icon.tabler }}</code>
-          </div>
-        </div>
-      </div>
+        </var-col>
+      </var-row>
     </section>
   </section>
 </template>
 
 <style scoped>
-.admin-page-span {
-  grid-column: 1 / -1;
-}
-
 .admin-icons {
   display: grid;
   gap: 16px;
@@ -162,18 +170,11 @@ function splitIconValue(value) {
   align-self: center;
 }
 
-.admin-icons__examples,
-.admin-icons__grid {
-  display: grid;
-  gap: 12px;
-}
-
-.admin-icons__examples {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 .admin-icons__example,
 .admin-icons__item {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   min-width: 0;
   border: 1px solid var(--color-outline-variant);
 }
@@ -217,10 +218,6 @@ function splitIconValue(value) {
   gap: 12px;
 }
 
-.admin-icons__grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
 .admin-icons__item {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
@@ -255,17 +252,8 @@ function splitIconValue(value) {
   line-height: 1.5;
 }
 
-@media (max-width: 1024px) {
-  .admin-icons__examples,
-  .admin-icons__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 768px) {
-  .admin-icons__header,
-  .admin-icons__examples,
-  .admin-icons__grid {
+  .admin-icons__header {
     grid-template-columns: 1fr;
   }
 }

@@ -35,6 +35,7 @@ test-results
 .vitest
 .task-plans/
 .ai-dev/
+.agents/skills/using-varlet/.cache/
 
 # System files
 .DS_Store
