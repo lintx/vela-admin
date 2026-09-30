@@ -9,6 +9,8 @@
 1. `src`
 2. `styles`
 
+包以源码形式发布（`main` 和 `exports` 指向 `src` 下的 `.ts` / `.vue`），不含预编译产物。`pnpm --filter vela-admin build` 产出的 `dist` 只用于验证源码可编译，不进入发布内容；用户项目通过 Vite 的 `optimizeDeps` 直接编译这些源码，消费方式见 [快速开始](../quick-start.md#npm-安装与消费)。
+
 `create-vela-admin` 发布生成器包，只应包含：
 
 1. `src`

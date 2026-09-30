@@ -39,6 +39,10 @@
       "types": "./src/icons/index.ts",
       "import": "./src/icons/index.ts"
     },
+    "./icons/phosphor": {
+      "types": "./src/icons/phosphor-index.ts",
+      "import": "./src/icons/phosphor-index.ts"
+    },
     "./layout": {
       "types": "./src/layout/index.ts",
       "import": "./src/layout/index.ts"
@@ -76,6 +80,7 @@
   ],
   "scripts": {
     "test": "vitest run",
+    "check:type": "tsc --noEmit -p tsconfig.typecheck.json",
     "build": "vite build"
   },
   "dependencies": {

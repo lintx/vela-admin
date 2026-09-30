@@ -67,13 +67,15 @@ function getGlobalCssVariables(theme: ResolvedAdminTheme): Record<string, string
   )
 }
 
-function removeInlineVarletColorVariables(style: CSSStyleDeclaration, nextCssVariableNames: Set<string>): void {
-  Array.from(style)
+type StyleWriter = ThemeStyleTarget['style']
+
+function removeInlineVarletColorVariables(style: StyleWriter, nextCssVariableNames: Set<string>): void {
+  Array.from(style as CSSStyleDeclaration)
     .filter((name) => (/^--hsl-/.test(name) || /^--color-/.test(name)) && !nextCssVariableNames.has(name))
     .forEach((name) => style.removeProperty?.(name))
 }
 
-function removeInlineMd2ScopedVariables(style: CSSStyleDeclaration, nextCssVariableNames: Set<string>): void {
+function removeInlineMd2ScopedVariables(style: StyleWriter, nextCssVariableNames: Set<string>): void {
   md2LightScopedVariableNames
     .forEach((name) => {
       if (!nextCssVariableNames.has(name)) {

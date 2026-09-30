@@ -1,14 +1,11 @@
 export {
-  default as VaIcon,
-} from './VaIcon.vue'
-export {
-  defaultAdminIconConfig,
-  resolveAdminIcon,
-} from './icon-registry'
-export {
   phosphorOnlyAdminIconConfig,
   resolvePhosphorIcon,
 } from './phosphor-icon-registry'
+export {
+  phosphorIconComponents,
+  type PhosphorIconName,
+} from './phosphor-icon-components'
 export {
   getAdminSemanticIconEntries,
   type AdminSemanticIconEntry,

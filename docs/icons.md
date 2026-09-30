@@ -79,6 +79,25 @@ export default defineAdminConfig({
 })
 ```
 
+## 只要 Phosphor，减小打包体积
+
+默认入口同时注册 Phosphor 和 Tabler 两套图标，业务项目即使只用 Phosphor，也会把已注册的 Tabler 图标打入生产包。确认不使用 Tabler 时，可以改用 phosphor-only 入口：
+
+```js
+// vite.config.js
+export default {
+  optimizeDeps: {
+    include: ['vela-admin/icons/phosphor'],
+  },
+}
+```
+
+```js
+import { resolvePhosphorIcon, phosphorOnlyAdminIconConfig } from 'vela-admin/icons/phosphor'
+```
+
+该入口的 fallback 链完全落在 Phosphor 内部，不会引入 `@tabler/icons-vue`。语义图标名解析行为与默认入口一致。
+
 ## 语义图标清单
 
 示例工程内置“图标”页面会展示所有语义图标、推荐用途、Phosphor 映射和 Tabler 映射。也可以在代码中读取：

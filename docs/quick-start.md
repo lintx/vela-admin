@@ -68,6 +68,34 @@ my-app/
 
 这些账号只用于本地演示。真实项目应接入自己的后端登录、会话续期、退出和敏感凭据存储策略。
 
+## npm 安装与消费
+
+生成器创建的项目已经配置好，直接 `pnpm run dev` 即可。如果是在已有 Vite 项目中手动安装 `vela-admin`，需要注意包以源码形式发布（`main` 指向 `src`，不含预编译产物）：
+
+```sh
+pnpm add vela-admin @varlet/ui vue vue-router
+```
+
+Vite 的 dev server 默认不转换 `node_modules` 中的 `.vue` 文件，需要把框架加入 `optimizeDeps.include`，否则浏览器会收到未编译的 SFC 而报错：
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  optimizeDeps: {
+    include: [
+      'vela-admin',
+      'vela-admin/app',
+      'vela-admin/router',
+      // 按需补充其它子路径，例如 vela-admin/layout、vela-admin/theme
+    ],
+  },
+})
+```
+
+生产构建（`vite build`）会正常编译这些源码，不需要额外配置。框架样式通过 `import 'vela-admin/style'` 引入。
+
 ## 最小接入
 
 业务工程通过 `createAdminApp()`、`createAdminRouter()` 和 `defineAdminConfig()` 接入框架：

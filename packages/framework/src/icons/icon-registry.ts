@@ -29,15 +29,29 @@ export function resolveAdminIcon(
   }
 
   const fallbackName = semantic?.[config.fallbackLibrary] ?? 'question'
+  // 末位兜底取 phosphor 内置 question 图标，保证任何输入都能解析出可渲染组件
   const fallback = resolveLibraryIcon(config.fallbackLibrary, fallbackName, value, true)
-    ?? resolveLibraryIcon('phosphor', 'question', value, true)
+    ?? resolveBuiltinQuestionIcon(value)
 
   warnUnknownIcon(value)
 
   return fallback
 }
 
-function parseIconValue(value: string, defaultLibrary: AdminIconLibrary) {
+function resolveBuiltinQuestionIcon(key: string): ResolvedAdminIcon {
+  const component = phosphorIconComponents.question
+
+  return {
+    key,
+    library: 'phosphor',
+    name: 'question',
+    componentName: `${componentNamePrefixes.phosphor}${toPascalCase('question')}`,
+    component,
+    fallback: true,
+  }
+}
+
+function parseIconValue(value: string, defaultLibrary: AdminIconLibrary): { library: AdminIconLibrary, name: string } {
   const [maybeLibrary, ...nameParts] = value.split(':')
 
   if ((maybeLibrary === 'phosphor' || maybeLibrary === 'tabler') && nameParts.length > 0) {

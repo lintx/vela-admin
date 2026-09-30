@@ -3,11 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "dev": "pnpm --filter vela-admin-example dev",
     "build": "pnpm --filter vela-admin build && pnpm --filter vela-admin-example build",
     "build:cloudflare-pages": "pnpm --filter vela-admin-example build:cloudflare-pages",
-    "test": "pnpm --filter vela-admin test && pnpm run test:create && pnpm run test:skills && pnpm run test:deprecations",
+    "test": "pnpm --filter vela-admin check:type && pnpm --filter vela-admin test && pnpm run test:create && pnpm run test:skills && pnpm run test:deprecations",
+    "check:type": "pnpm --filter vela-admin check:type",
     "test:create": "node --test packages/create-vela-admin/tests/create-cli.test.js scripts/package-command.test.js",
     "test:skills": "node --test scripts/project-skills.test.js scripts/install-codex-skill.test.js .agents/skills/using-varlet/scripts/sync-varlet-docs.test.mjs",
     "test:deprecations": "node --test scripts/deprecations.test.js && node scripts/deprecations.js check",
@@ -26,9 +28,5 @@
     "codex:link-skill": "node scripts/install-codex-skill.js --link",
     "codex:install-skills": "node scripts/install-codex-skill.js --all",
     "codex:link-skills": "node scripts/install-codex-skill.js --all --link"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.3",
-    "vite": "^6.2.4"
   }
 }

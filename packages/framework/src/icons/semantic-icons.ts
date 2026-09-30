@@ -1,5 +1,7 @@
 import type { AdminSemanticIconEntry } from './icon-types'
 
+export type { AdminSemanticIconEntry }
+
 export const adminSemanticIcons = [
   { name: 'dashboard', label: '控制台', usage: '后台首页、仪表盘菜单', phosphor: 'chart-pie-slice', tabler: 'layout-dashboard' },
   { name: 'home', label: '首页', usage: '首页入口、返回首页操作', phosphor: 'house', tabler: 'home' },

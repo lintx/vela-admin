@@ -1110,6 +1110,24 @@ function itemMap() {
   return new Map(props.items.map(item => [getKey(item), item]))
 }
 
+/**
+ * 拖拽热路径缓存。
+ *
+ * getItemState 与 getHandleProps 会对每个 item 调用一次，而 isItemDisabled
+ * 等函数原本每次都重建全量 Map 并做线性查找，单次渲染退化为 O(n²)。
+ * 这里把 Map 和索引缓存到 computed，props.items 不变时直接复用。
+ */
+const cachedItemMap = computed(() => itemMap())
+const cachedKeyIndex = computed(() => {
+  const indexMap = new Map<VaSortableKey, number>()
+
+  itemKeys().forEach((key, index) => {
+    indexMap.set(key, index)
+  })
+
+  return indexMap
+})
+
 function getKey(item: SortableItem) {
   return item[props.itemKey] as VaSortableKey
 }
@@ -1128,9 +1146,9 @@ function isItemDisabled(key: VaSortableKey) {
     return true
   }
 
-  const item = itemMap().get(key)
-  const index = itemKeys().findIndex(itemKey => itemKey === key)
-  return Boolean(item && props.getItemDisabled?.(item, index))
+  const item = cachedItemMap.value.get(key)
+  const index = cachedKeyIndex.value.get(key)
+  return index !== undefined ? Boolean(item && props.getItemDisabled?.(item, index)) : false
 }
 
 function isItemSelected(key: VaSortableKey) {
@@ -1138,9 +1156,9 @@ function isItemSelected(key: VaSortableKey) {
     return true
   }
 
-  const item = itemMap().get(key)
-  const index = itemKeys().findIndex(itemKey => itemKey === key)
-  return Boolean(item && props.getItemSelected?.(item, index))
+  const item = cachedItemMap.value.get(key)
+  const index = cachedKeyIndex.value.get(key)
+  return index !== undefined ? Boolean(item && props.getItemSelected?.(item, index)) : false
 }
 
 function isItemPositionLocked(key: VaSortableKey, targetContext = context) {
@@ -1148,9 +1166,11 @@ function isItemPositionLocked(key: VaSortableKey, targetContext = context) {
     return true
   }
 
-  const keys = targetContext.itemKeys()
-  const index = keys.findIndex(itemKey => itemKey === key)
-  const item = targetContext.itemMap().get(key)
+  // 跨列表场景下目标 context 的键集合与本组件缓存不同源，仍按需线性查找
+  const index = targetContext === context
+    ? cachedKeyIndex.value.get(key) ?? -1
+    : targetContext.itemKeys().findIndex(itemKey => itemKey === key)
+  const item = (targetContext === context ? cachedItemMap.value : targetContext.itemMap()).get(key)
   return item ? props.getItemLock?.(item, index) === 'position' : false
 }
 

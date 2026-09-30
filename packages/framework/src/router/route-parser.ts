@@ -43,8 +43,9 @@ export function parseAdminRoutes(glob: PageGlob, options: ParseAdminRoutesOption
       path: entry.routePath,
       name: entry.name,
       component: resolvePageComponent(entry.module),
-      meta: entry.meta,
-    }))
+      // AdminRouteMeta 的 string 索引签名满足不了 vue-router 4.6 对 RouteMeta 的 PropertyKey 要求，在边界处断言
+      meta: entry.meta as RouteRecordRaw['meta'],
+    } as RouteRecordRaw))
 }
 
 export function parseAdminMenuMeta(glob: PageGlob, options: ParseAdminRoutesOptions = {}): AdminMenuMeta[] {
@@ -178,11 +179,15 @@ function createRouteEntry(
   const inferredRoutePath = fileNameToRoutePath(relativePath)
   const routePath = typeof inlineRoute?.path === 'string' ? inlineRoute.path : inferredRoutePath
 
+  const inlineName = typeof inlineRoute?.name === 'string' || typeof inlineRoute?.name === 'symbol'
+    ? inlineRoute.name
+    : undefined
+
   return {
     index,
     filePath,
     routePath,
-    name: inlineRoute?.name ?? routeNameFromPath(routePath),
+    name: inlineName ?? routeNameFromPath(routePath),
     module,
     route: inlineRoute,
     meta: {
@@ -311,7 +316,7 @@ function normalizePermission(permission: unknown): AdminMenuMeta['permission'] {
 
 function assertUniqueRoutes(entries: RouteEntry[]): void {
   const paths = new Set<string>()
-  const names = new Set<string>()
+  const names = new Set<NonNullable<RouteRecordRaw['name']>>()
 
   entries.forEach((entry) => {
     if (paths.has(entry.routePath)) {

@@ -42,9 +42,11 @@ export {
 } from './components/AdminSettingsDrawer.vue'
 export {
   default as AdminThemeGenerator,
-  type AdminThemeGeneratorPayload,
-  type ThemeColorChip,
 } from './components/AdminThemeGenerator.vue'
+export type {
+  AdminThemeGeneratorPayload,
+  ThemeColorChip,
+} from './components/theme-generator-types'
 export {
   default as AdminThemePreviewBar,
 } from './components/AdminThemePreviewBar.vue'
