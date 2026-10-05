@@ -45,5 +45,6 @@ describe('npm package entry integrity', () => {
 
     // icons.md 的 phosphor-only 示例依赖该子路径
     expect(subpaths, '缺少文档引用的子路径 ./icons/phosphor').toContain('./icons/phosphor')
+    expect(subpaths, '缺少文档引用的子路径 ./loading-bar').toContain('./loading-bar')
   })
 })

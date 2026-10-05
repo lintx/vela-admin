@@ -1,6 +1,6 @@
 {
   "name": "vela-admin",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "private": false,
   "type": "module",
   "license": "MIT",
@@ -66,6 +66,10 @@
     "./tabs": {
       "types": "./src/tabs/index.ts",
       "import": "./src/tabs/index.ts"
+    },
+    "./loading-bar": {
+      "types": "./src/loading-bar/index.ts",
+      "import": "./src/loading-bar/index.ts"
     },
     "./style": "./styles/index.css"
   },

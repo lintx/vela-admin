@@ -25,7 +25,7 @@ describe('example page surfaces', () => {
 
   it('keeps context menu targets full width in their panels', () => {
     const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/pages/context-menu.vue'),
+      resolve(__dirname, '../../../../examples/admin/src/pages/components/context-menu.vue'),
       'utf8',
     )
 
@@ -37,9 +37,9 @@ describe('example page surfaces', () => {
 
   it('uses Varlet grid primitives for representative multi-column pages', () => {
     const files = [
-      'icons.vue',
+      'components/icons.vue',
       'index.vue',
-      'context-menu.vue',
+      'components/context-menu.vue',
     ]
 
     for (const name of files) {
@@ -64,7 +64,7 @@ describe('example page surfaces', () => {
 
   it('keeps icon cards readable across the Varlet medium breakpoint', () => {
     const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/pages/icons.vue'),
+      resolve(__dirname, '../../../../examples/admin/src/pages/components/icons.vue'),
       'utf8',
     )
 

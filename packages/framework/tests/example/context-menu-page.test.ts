@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import contextMenuMeta from '../../../../examples/admin/src/pages/context-menu.meta.js'
+import contextMenuMeta from '../../../../examples/admin/src/pages/components/context-menu.meta.js'
 
 describe('example context menu page', () => {
   it('defines a top-level menu entry for context menu usage', () => {
@@ -15,7 +15,7 @@ describe('example context menu page', () => {
 
   it('covers data, template, trigger, icon and custom item examples', () => {
     const source = readFileSync(
-      resolve(__dirname, '../../../../examples/admin/src/pages/context-menu.vue'),
+      resolve(__dirname, '../../../../examples/admin/src/pages/components/context-menu.vue'),
       'utf8',
     )
 

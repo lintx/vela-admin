@@ -16,6 +16,8 @@ const router = createAdminRouter({
 
 默认情况下，`.vue` 页面会被 Vite 编译为动态导入函数，进入对应路由时才加载页面代码；同名 `.meta.js` 会 eager 加载，用于同步生成菜单、标题、权限和排序。
 
+页面导航默认启用顶部加载条，具体控制方式见 [页面进度条](loading-bar.md)。
+
 ## 文件到路径
 
 | 文件 | 路由 |

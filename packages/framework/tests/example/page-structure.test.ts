@@ -23,6 +23,7 @@ describe('example page structure', () => {
 
     expect(existsSync(resolve(pagesRoot, 'components/icons.vue'))).toBe(true)
     expect(existsSync(resolve(pagesRoot, 'components/context-menu.vue'))).toBe(true)
+    expect(existsSync(resolve(pagesRoot, 'components/loading-bar.vue'))).toBe(true)
     expect(existsSync(resolve(pagesRoot, 'components/permission.button.vue'))).toBe(true)
     expect(existsSync(resolve(pagesRoot, 'components/menu-demo/overflow-menu/[item].vue'))).toBe(true)
     expect(existsSync(resolve(pagesRoot, 'components/exception/errors/403.vue'))).toBe(true)

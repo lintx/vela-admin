@@ -249,3 +249,11 @@ export type {
   VaSortablePayload,
   VaSortableStrategy,
 } from './components/sortable/sortable-types'
+
+export {
+  adminLoadingBar,
+  createAdminLoadingBar,
+  useAdminLoadingBar,
+  type AdminLoadingBarOptions,
+  type AdminLoadingBarService,
+} from './loading-bar'
