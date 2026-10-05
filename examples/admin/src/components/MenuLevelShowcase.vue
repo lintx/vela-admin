@@ -17,12 +17,12 @@ defineProps({
 })
 
 const steps = [
-  { title: '菜单示例', path: '/menu-demo', icon: 'demo', directory: true },
-  { title: '父有图标 / 子无图标', path: '/menu-demo/icon-parent/text-child', icon: 'level-1', directory: false },
-  { title: '父有图标 / 子有图标', path: '/menu-demo/icon-parent/icon-child', icon: 'security', directory: false },
-  { title: '父无图标 / 子无图标', path: '/menu-demo/text-parent/text-child', icon: 'level-2', directory: false },
-  { title: '父无图标 / 子有图标', path: '/menu-demo/text-parent/icon-child', icon: 'user', directory: false },
-  { title: '四级页面', path: '/menu-demo/level1/level2/level3/leaf', icon: 'level-4', directory: false },
+  { title: '菜单示例', path: '/components/menu-demo', icon: 'demo', directory: true },
+  { title: '父有图标 / 子无图标', path: '/components/menu-demo/icon-parent/text-child', icon: 'level-1', directory: false },
+  { title: '父有图标 / 子有图标', path: '/components/menu-demo/icon-parent/icon-child', icon: 'security', directory: false },
+  { title: '父无图标 / 子无图标', path: '/components/menu-demo/text-parent/text-child', icon: 'level-2', directory: false },
+  { title: '父无图标 / 子有图标', path: '/components/menu-demo/text-parent/icon-child', icon: 'user', directory: false },
+  { title: '四级页面', path: '/components/menu-demo/level1/level2/level3/leaf', icon: 'level-4', directory: false },
 ]
 
 const leafStep = steps.find((item) => !item.directory)

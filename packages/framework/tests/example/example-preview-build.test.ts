@@ -9,8 +9,8 @@ describe('example preview build targets', () => {
     const source = readFileSync(resolve(exampleRoot, 'src/main.js'), 'utf8')
 
     expect(source).toContain('return appendOverflowMenu(menus)')
-    expect(source).toContain("path: '/menu-demo/overflow-menu'")
-    expect(source).toContain('path: `/menu-demo/overflow-menu/item-${itemNumber}`')
+    expect(source).toContain("path: '/components/menu-demo/overflow-menu'")
+    expect(source).toContain('path: `/components/menu-demo/overflow-menu/item-${itemNumber}`')
     expect(source).not.toContain('import.meta.env.DEV ? [...menus, createOverflowMenu()] : menus')
   })
 

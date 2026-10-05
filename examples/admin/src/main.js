@@ -30,11 +30,11 @@ import App from './App.vue'
 const lazyPages = import.meta.glob([
   './pages/**/*.vue',
   '!./pages/index.vue',
-  '!./pages/errors/**/*.vue',
+  '!./pages/components/exception/errors/**/*.vue',
 ])
 const eagerPages = import.meta.glob([
   './pages/index.vue',
-  './pages/errors/**/*.vue',
+  './pages/components/exception/errors/**/*.vue',
 ], { eager: true })
 const pageMeta = import.meta.glob('./pages/**/*.meta.js', { eager: true })
 const pagesMap = {
@@ -46,9 +46,9 @@ const routerHistoryMode = import.meta.env.VITE_ADMIN_ROUTER_HISTORY === 'hash' ?
 const router = createAdminRouter({
   pages: pagesMap,
   specialRoutes: [
-    { path: '/exception/403', type: 'forbidden' },
-    { path: '/exception/404', type: 'not-found' },
-    { path: '/exception/500', type: 'server-error' },
+    { path: '/components/exception/403', type: 'forbidden' },
+    { path: '/components/exception/404', type: 'not-found' },
+    { path: '/components/exception/500', type: 'server-error' },
     { path: '/:path(.*)', type: 'not-found' },
   ],
   history: routerHistoryMode === 'hash'
@@ -62,7 +62,7 @@ let menuService
 
 router.beforeEach(createPermissionGuard(permission, {
   loginPath: '/login',
-  forbiddenPath: '/exception/403',
+    forbiddenPath: '/components/exception/403',
 }))
 
 function createExampleMenuService() {
@@ -84,8 +84,8 @@ function createExampleMenuService() {
     },
 
     getActivePaths(path) {
-      if (path.startsWith('/menu-demo/overflow-menu/')) {
-        return ['/menu-demo', '/menu-demo/overflow-menu', path]
+      if (path.startsWith('/components/menu-demo/overflow-menu/')) {
+        return ['/components', '/components/menu-demo', '/components/menu-demo/overflow-menu', path]
       }
 
       return service.getActivePaths(path)
@@ -96,7 +96,7 @@ function createExampleMenuService() {
 function appendOverflowMenu(menus) {
   // 动态超长菜单挂在菜单示例下，与静态多级菜单案例统一展示。
   return menus.map((menu) => {
-    if (menu.path !== '/menu-demo') {
+    if (menu.path !== '/components/menu-demo') {
       return menu
     }
 
@@ -109,7 +109,7 @@ function appendOverflowMenu(menus) {
 
 function createOverflowMenu() {
   return {
-    path: '/menu-demo/overflow-menu',
+    path: '/components/menu-demo/overflow-menu',
     title: '超长菜单',
     icon: 'format-list-bulleted',
     order: 90,
@@ -118,7 +118,7 @@ function createOverflowMenu() {
       const itemNumber = index + 1
 
       return {
-        path: `/menu-demo/overflow-menu/item-${itemNumber}`,
+        path: `/components/menu-demo/overflow-menu/item-${itemNumber}`,
         title: `超长菜单项 ${String(itemNumber).padStart(2, '0')}`,
         order: itemNumber,
         navigable: true,

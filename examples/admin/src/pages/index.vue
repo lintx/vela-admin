@@ -15,6 +15,7 @@ export const route = {
 import { computed, inject } from 'vue'
 
 import { VaIcon } from 'vela-admin/components'
+import { menuInjectionKey } from 'vela-admin/menu'
 import { permissionInjectionKey } from 'vela-admin/permission'
 
 defineProps({
@@ -39,9 +40,10 @@ defineProps({
 defineEmits(['update:source-color', 'apply-theme', 'reset-theme'])
 
 const permission = inject(permissionInjectionKey)
+const menu = inject(menuInjectionKey)
 const session = computed(() => permission?.getSession() ?? { user: {}, roles: [], permissions: [] })
 const stats = computed(() => [
-  { label: '可见菜单', value: '8', icon: 'data', tone: 'primary' },
+  { label: '可见菜单', value: String(menu?.getMenus().length ?? 0), icon: 'data', tone: 'primary' },
   { label: '权限码', value: String(session.value.permissions.length), icon: 'shield-check', tone: 'success' },
   { label: '打开标签', value: '默认开启', icon: 'tabs', tone: 'info' },
   { label: '主题模式', value: 'MD3 / MD2', icon: 'theme', tone: 'warning' },
