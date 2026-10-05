@@ -1,5 +1,9 @@
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+import ExceptionArtwork from './ExceptionArtwork.vue'
+
+const props = defineProps({
   code: {
     type: String,
     required: true,
@@ -12,119 +16,75 @@ defineProps({
     type: String,
     required: true,
   },
-  image: {
-    type: String,
-    required: true,
-  },
   type: {
     type: String,
     default: 'error',
   },
 })
+
+const tone = computed(() => {
+  if (props.code === '403') {
+    return 'warning'
+  }
+
+  if (props.code === '500') {
+    return 'danger'
+  }
+
+  return 'primary'
+})
+
+const statusLabel = computed(() => {
+  const labels = {
+    '403': '访问受限',
+    '404': '路径未找到',
+    '500': '服务异常',
+  }
+
+  return labels[props.code] || '请求异常'
+})
 </script>
 
 <template>
-  <section class="admin-exception">
+  <section class="admin-exception" :data-tone="tone" aria-live="polite">
+    <div class="admin-exception__ambient admin-exception__ambient--top" aria-hidden="true" />
     <div class="admin-exception__surface">
-      <div class="admin-exception__visual">
-        <img :src="image" :alt="`${code} ${title}`" />
+      <div class="admin-exception__content">
+        <div class="admin-exception__visual">
+          <div class="admin-exception__visual-frame">
+            <ExceptionArtwork :code="code" />
+          </div>
+        </div>
+
+        <var-result
+          class="admin-exception__result"
+          :type="type"
+          :title="title"
+          :description="description"
+          :animation="false"
+        >
+          <template #image>
+            <div class="admin-exception__code-mark">
+              <span class="admin-exception__code">{{ code }}</span>
+              <span class="admin-exception__code-label">{{ statusLabel }}</span>
+            </div>
+          </template>
+
+          <template #footer>
+            <var-space class="admin-exception__actions" :size="[10, 10]" justify="start">
+              <var-button type="primary" @click="$router.push('/')">
+                返回控制台
+              </var-button>
+              <var-button @click="$router.back()">
+                返回上一页
+              </var-button>
+              <slot name="actions" />
+            </var-space>
+          </template>
+        </var-result>
       </div>
-
-      <var-result
-        class="admin-exception__result"
-        :type="type"
-        :title="title"
-        :description="description"
-        :animation="false"
-      >
-        <template #image>
-          <span class="admin-exception__code">{{ code }}</span>
-        </template>
-
-        <template #footer>
-          <var-space class="admin-exception__actions" :size="[8, 8]" justify="center">
-            <var-button type="primary" @click="$router.push('/')">
-              返回控制台
-            </var-button>
-            <var-button @click="$router.back()">
-              返回上一页
-            </var-button>
-            <slot name="actions" />
-          </var-space>
-        </template>
-      </var-result>
     </div>
   </section>
 </template>
 
-<style scoped>
-.admin-exception {
-  min-width: 0;
-}
-
-.admin-exception__surface {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.92fr) minmax(300px, 1fr);
-  align-items: center;
-  min-height: min(560px, calc(100dvh - 168px));
-  padding-top: clamp(12px, 3vw, 28px);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 7%, transparent), transparent 44%);
-  gap: clamp(20px, 5vw, 56px);
-}
-
-.admin-exception__visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-}
-
-.admin-exception__visual img {
-  display: block;
-  width: min(100%, 460px);
-  aspect-ratio: 1;
-  object-fit: contain;
-}
-
-.admin-exception__result {
-  min-width: 0;
-}
-
-.admin-exception__code {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 86px;
-  height: 40px;
-  padding: 0 18px;
-  color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 9%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
-  border-radius: var(--chip-border-radius, 4px);
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0;
-}
-
-.admin-exception__actions {
-  flex-wrap: wrap;
-}
-
-:deep(.var-result__description) {
-  max-width: 520px;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-@media (max-width: 820px) {
-  .admin-exception__surface {
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
-
-  .admin-exception__visual img {
-    width: min(100%, 320px);
-  }
-}
-</style>
+<style scoped src="./ExceptionPage.css"></style>

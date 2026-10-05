@@ -6,7 +6,6 @@ export const route = {
 </script>
 
 <script setup>
-import illustration from '../../assets/errors/404.png'
 import ExceptionPage from '../../components/ExceptionPage.vue'
 </script>
 
@@ -15,7 +14,6 @@ import ExceptionPage from '../../components/ExceptionPage.vue'
     code="404"
     title="页面不存在"
     description="当前路由没有匹配到示例页面，请返回控制台或通过菜单重新进入。"
-    :image="illustration"
     type="empty"
   />
 </template>
