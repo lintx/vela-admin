@@ -5,10 +5,12 @@ import { describe, expect, it } from 'vitest'
 const exampleRoot = resolve(__dirname, '../../../../examples/admin')
 
 describe('example preview build targets', () => {
-  it('always includes the overflow menu in the user-facing preview', () => {
+  it('nests the overflow menu under the menu demo in the user-facing preview', () => {
     const source = readFileSync(resolve(exampleRoot, 'src/main.js'), 'utf8')
 
-    expect(source).toContain('return [...menus, createOverflowMenu()]')
+    expect(source).toContain('return appendOverflowMenu(menus)')
+    expect(source).toContain("path: '/menu-demo/overflow-menu'")
+    expect(source).toContain('path: `/menu-demo/overflow-menu/item-${itemNumber}`')
     expect(source).not.toContain('import.meta.env.DEV ? [...menus, createOverflowMenu()] : menus')
   })
 

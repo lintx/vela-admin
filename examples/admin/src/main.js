@@ -76,7 +76,7 @@ function createExampleMenuService() {
     getMenus() {
       const menus = service.getMenus()
 
-      return [...menus, createOverflowMenu()]
+      return appendOverflowMenu(menus)
     },
 
     getDiagnostics() {
@@ -84,8 +84,8 @@ function createExampleMenuService() {
     },
 
     getActivePaths(path) {
-      if (path.startsWith('/overflow-menu/')) {
-        return ['/overflow-menu', path]
+      if (path.startsWith('/menu-demo/overflow-menu/')) {
+        return ['/menu-demo', '/menu-demo/overflow-menu', path]
       }
 
       return service.getActivePaths(path)
@@ -93,9 +93,23 @@ function createExampleMenuService() {
   }
 }
 
+function appendOverflowMenu(menus) {
+  // 动态超长菜单挂在菜单示例下，与静态多级菜单案例统一展示。
+  return menus.map((menu) => {
+    if (menu.path !== '/menu-demo') {
+      return menu
+    }
+
+    return {
+      ...menu,
+      children: [...menu.children, createOverflowMenu()],
+    }
+  })
+}
+
 function createOverflowMenu() {
   return {
-    path: '/overflow-menu',
+    path: '/menu-demo/overflow-menu',
     title: '超长菜单',
     icon: 'format-list-bulleted',
     order: 90,
@@ -104,7 +118,7 @@ function createOverflowMenu() {
       const itemNumber = index + 1
 
       return {
-        path: `/overflow-menu/item-${itemNumber}`,
+        path: `/menu-demo/overflow-menu/item-${itemNumber}`,
         title: `超长菜单项 ${String(itemNumber).padStart(2, '0')}`,
         order: itemNumber,
         navigable: true,

@@ -17,7 +17,7 @@ defineProps({
 })
 
 const steps = [
-  { title: '多级示例', path: '/menu-demo', icon: 'demo', directory: true },
+  { title: '菜单示例', path: '/menu-demo', icon: 'demo', directory: true },
   { title: '父有图标 / 子无图标', path: '/menu-demo/icon-parent/text-child', icon: 'level-1', directory: false },
   { title: '父有图标 / 子有图标', path: '/menu-demo/icon-parent/icon-child', icon: 'security', directory: false },
   { title: '父无图标 / 子无图标', path: '/menu-demo/text-parent/text-child', icon: 'level-2', directory: false },
